@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Lock, LogOut, Users, HelpCircle, FileText, Settings, BarChart } from 'lucide-react';
 
 interface Stats {
   totalTeams: number;
@@ -61,110 +65,140 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="admin-login min-h-screen flex items-center justify-center p-4">
-        <div className="admin-login-card w-full max-w-md bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-8 animate-fade-in">
-          <div className="admin-login-header text-center mb-8">
-            <div className="admin-login-icon text-5xl mb-4">🔐</div>
-            <h1 className="admin-login-title text-2xl font-bold text-white">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card variant="ornate" className="w-full max-w-md animate-fade-in">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] mb-4">
+              <Lock size={32} />
+            </div>
+            <h1 className="text-2xl font-serif font-bold text-[var(--foreground)]">
               Panell d&apos;Administració
             </h1>
           </div>
 
-          <form onSubmit={handleLogin} className="admin-login-form space-y-6">
-            <div>
-              <label className="admin-login-label block text-sm font-medium text-gray-300 mb-2">
-                Contrasenya
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="admin-login-input w-full px-4 py-3 bg-[var(--background)] border border-[var(--card-border)] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
-                placeholder="Introdueix la contrasenya"
-              />
-            </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <Input
+              type="password"
+              label="Contrasenya"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Introdueix la contrasenya"
+              error={error}
+            />
 
-            {error && (
-              <div className="admin-login-error bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
+            <Button
               type="submit"
-              className="admin-login-submit w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"
+              fullWidth
+              size="lg"
             >
               Entrar
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="admin-loading min-h-screen flex items-center justify-center">
-        <div className="admin-loading-spinner animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="admin-dashboard min-h-screen p-4 md:p-8">
-      <div className="admin-dashboard-content max-w-6xl mx-auto">
-        <div className="admin-header flex items-center justify-between mb-8">
-          <h1 className="admin-title text-3xl font-bold text-white">
-            🎮 Panell d&apos;Administració
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-serif font-bold text-[var(--primary)] flex items-center gap-3">
+            <Settings className="text-[var(--secondary)]" />
+            Panell d&apos;Administració
           </h1>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => {
               sessionStorage.removeItem('admin-auth');
               setIsAuthenticated(false);
             }}
-            className="admin-logout text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2"
           >
+            <LogOut size={18} />
             Sortir
-          </button>
+          </Button>
         </div>
 
         {/* Stats */}
-        <div className="admin-stats grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="admin-stat-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-6">
-            <div className="admin-stat-icon text-3xl mb-2">👥</div>
-            <div className="admin-stat-value text-3xl font-bold text-white">{stats?.totalTeams}</div>
-            <div className="admin-stat-label text-gray-400">Equips</div>
-          </div>
-          <div className="admin-stat-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-6">
-            <div className="admin-stat-icon text-3xl mb-2">❓</div>
-            <div className="admin-stat-value text-3xl font-bold text-white">{stats?.totalQuestions}</div>
-            <div className="admin-stat-label text-gray-400">Preguntes</div>
-          </div>
-          <div className="admin-stat-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-6">
-            <div className="admin-stat-icon text-3xl mb-2">✍️</div>
-            <div className="admin-stat-value text-3xl font-bold text-white">{stats?.totalAnswers}</div>
-            <div className="admin-stat-label text-gray-400">Respostes</div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center">
+              <Users size={24} />
+            </div>
+            <div>
+              <div className="text-3xl font-serif font-bold text-[var(--foreground)]">{stats?.totalTeams}</div>
+              <div className="text-sm text-[var(--foreground)]/60 uppercase tracking-wider">Equips</div>
+            </div>
+          </Card>
+          
+          <Card className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[var(--secondary)]/10 text-[var(--secondary)] flex items-center justify-center">
+              <HelpCircle size={24} />
+            </div>
+            <div>
+              <div className="text-3xl font-serif font-bold text-[var(--foreground)]">{stats?.totalQuestions}</div>
+              <div className="text-sm text-[var(--foreground)]/60 uppercase tracking-wider">Preguntes</div>
+            </div>
+          </Card>
+          
+          <Card className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] flex items-center justify-center">
+              <FileText size={24} />
+            </div>
+            <div>
+              <div className="text-3xl font-serif font-bold text-[var(--foreground)]">{stats?.totalAnswers}</div>
+              <div className="text-sm text-[var(--foreground)]/60 uppercase tracking-wider">Respostes</div>
+            </div>
+          </Card>
         </div>
 
         {/* Navigation */}
-        <div className="admin-nav grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <button
             onClick={() => router.push('/admin/preguntes')}
-            className="admin-nav-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-8 text-left hover:border-[var(--primary)] transition-all group"
+            className="group text-left"
           >
-            <div className="admin-nav-icon text-4xl mb-4 group-hover:scale-110 transition-transform">📝</div>
-            <h2 className="admin-nav-title text-xl font-bold text-white mb-2">Gestionar Preguntes</h2>
-            <p className="admin-nav-desc text-gray-400">Crear, editar i eliminar preguntes. Generar codis QR.</p>
+            <Card className="h-full transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg border-[var(--card-border)] group-hover:border-[var(--primary)]/30">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-[var(--background)] border border-[var(--card-border)] flex items-center justify-center text-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:text-white transition-colors">
+                  <Settings size={28} />
+                </div>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-2 group-hover:text-[var(--primary)] transition-colors">
+                Gestionar Preguntes
+              </h2>
+              <p className="text-[var(--foreground)]/60">
+                Crear, editar i eliminar preguntes. Generar codis QR per al joc.
+              </p>
+            </Card>
           </button>
 
           <button
             onClick={() => router.push('/admin/respostes')}
-            className="admin-nav-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-8 text-left hover:border-[var(--primary)] transition-all group"
+            className="group text-left"
           >
-            <div className="admin-nav-icon text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
-            <h2 className="admin-nav-title text-xl font-bold text-white mb-2">Veure Respostes</h2>
-            <p className="admin-nav-desc text-gray-400">Consultar totes les respostes enviades pels equips.</p>
+            <Card className="h-full transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg border-[var(--card-border)] group-hover:border-[var(--secondary)]/30">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-[var(--background)] border border-[var(--card-border)] flex items-center justify-center text-[var(--secondary)] group-hover:bg-[var(--secondary)] group-hover:text-white transition-colors">
+                  <BarChart size={28} />
+                </div>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-2 group-hover:text-[var(--secondary)] transition-colors">
+                Veure Respostes
+              </h2>
+              <p className="text-[var(--foreground)]/60">
+                Consultar totes les respostes enviades pels equips i el seu estat.
+              </p>
+            </Card>
           </button>
         </div>
       </div>

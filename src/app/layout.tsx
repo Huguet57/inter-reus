@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -25,7 +31,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0f172a",
+  themeColor: "#FDFBF7",
 };
 
 export default function RootLayout({
@@ -36,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="ca">
       <body
-        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${playfair.variable} antialiased`}
       >
         {children}
       </body>

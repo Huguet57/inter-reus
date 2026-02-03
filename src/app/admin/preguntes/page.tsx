@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Question, QuestionType } from '@/types';
 import QRGenerator from '@/components/QRGenerator';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { 
+  ArrowLeft, Plus, Edit2, Trash2, QrCode, Power, 
+  Type, Image, Video, CheckSquare, List 
+} from 'lucide-react';
 
 export default function PreguntesPage() {
   const router = useRouter();
@@ -129,93 +136,101 @@ export default function PreguntesPage() {
     return '';
   };
 
+  const getTypeIcon = (type: QuestionType) => {
+    const icons = {
+      text: <Type size={16} />,
+      photo: <Image size={16} />,
+      video: <Video size={16} />,
+      true_false: <CheckSquare size={16} />,
+      multiple_choice: <List size={16} />,
+    };
+    return icons[type];
+  };
+
   const getTypeLabel = (type: QuestionType) => {
     const labels: Record<QuestionType, string> = {
-      text: '✍️ Text',
-      photo: '📷 Foto',
-      video: '🎥 Vídeo',
-      true_false: '✓/✗ V/F',
-      multiple_choice: '🔘 Múltiple',
+      text: 'Text',
+      photo: 'Foto',
+      video: 'Vídeo',
+      true_false: 'V/F',
+      multiple_choice: 'Múltiple',
     };
     return labels[type];
   };
 
   if (loading) {
     return (
-      <div className="preguntes-loading min-h-screen flex items-center justify-center">
-        <div className="preguntes-loading-spinner animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="preguntes-page min-h-screen p-4 md:p-8">
-      <div className="preguntes-content max-w-6xl mx-auto">
-        <div className="preguntes-header flex items-center justify-between mb-8">
-          <div className="preguntes-header-left flex items-center gap-4">
-            <button
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
               onClick={() => router.push('/admin')}
-              className="preguntes-back text-gray-400 hover:text-white transition-colors"
+              className="flex items-center gap-2"
             >
-              ← Tornar
-            </button>
-            <h1 className="preguntes-title text-2xl font-bold text-white">
+              <ArrowLeft size={18} />
+              Tornar
+            </Button>
+            <h1 className="text-2xl font-serif font-bold text-[var(--primary)]">
               Gestionar Preguntes
             </h1>
           </div>
-          <button
+          <Button
             onClick={() => setShowForm(true)}
-            className="preguntes-add-btn px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"
+            className="flex items-center gap-2"
           >
-            + Nova Pregunta
-          </button>
+            <Plus size={18} />
+            Nova Pregunta
+          </Button>
         </div>
 
         {/* Question Form Modal */}
         {showForm && (
-          <div className="preguntes-modal fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="preguntes-modal-content w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-              <h2 className="preguntes-form-title text-xl font-bold text-white mb-6">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-6">
                 {editingQuestion ? 'Editar Pregunta' : 'Nova Pregunta'}
               </h2>
 
-              <form onSubmit={handleSubmit} className="preguntes-form space-y-4">
-                <div>
-                  <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
-                    Títol
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    required
-                    className="preguntes-form-input w-full px-4 py-3 bg-[var(--background)] border border-[var(--card-border)] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-                    placeholder="Ex: On es troba la plaça del Mercadal?"
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <Input
+                  label="Títol"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                  placeholder="Ex: On es troba la plaça del Mercadal?"
+                />
 
-                <div>
-                  <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
                     Descripció / Instruccions
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="preguntes-form-textarea w-full px-4 py-3 bg-[var(--background)] border border-[var(--card-border)] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                    className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] placeholder:text-[var(--foreground)]/40 focus:outline-none focus:border-[var(--primary)] transition-colors font-sans resize-none"
                     placeholder="Instruccions addicionals per als jugadors..."
                   />
                 </div>
 
-                <div className="preguntes-form-row grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
                       Tipus de pregunta
                     </label>
                     <select
                       value={formData.type}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value as QuestionType })}
-                      className="preguntes-form-select w-full px-4 py-3 bg-[var(--background)] border border-[var(--card-border)] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                      className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors font-sans"
                     >
                       <option value="text">✍️ Resposta escrita</option>
                       <option value="photo">📷 Enviar foto</option>
@@ -225,34 +240,29 @@ export default function PreguntesPage() {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
-                      Punts
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.points}
-                      onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
-                      min="1"
-                      max="100"
-                      className="preguntes-form-input w-full px-4 py-3 bg-[var(--background)] border border-[var(--card-border)] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-                    />
-                  </div>
+                  <Input
+                    type="number"
+                    label="Punts"
+                    value={formData.points}
+                    onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
+                    min={1}
+                    max={100}
+                  />
                 </div>
 
                 {formData.type === 'true_false' && (
-                  <div>
-                    <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
                       Resposta correcta
                     </label>
-                    <div className="preguntes-form-tf-options flex gap-4">
+                    <div className="flex gap-4">
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, correct_answer: 'true' })}
-                        className={`preguntes-form-tf-btn flex-1 py-3 rounded-xl border-2 transition-all ${
+                        className={`flex-1 py-3 rounded-lg border-2 transition-all font-medium ${
                           formData.correct_answer === 'true'
-                            ? 'border-[var(--secondary)] bg-[var(--secondary)]/20 text-[var(--secondary)]'
-                            : 'border-[var(--card-border)] text-gray-400'
+                            ? 'border-[var(--secondary)] bg-[var(--secondary)]/10 text-[var(--secondary)]'
+                            : 'border-[var(--card-border)] text-[var(--foreground)]/60'
                         }`}
                       >
                         Veritat
@@ -260,10 +270,10 @@ export default function PreguntesPage() {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, correct_answer: 'false' })}
-                        className={`preguntes-form-tf-btn flex-1 py-3 rounded-xl border-2 transition-all ${
+                        className={`flex-1 py-3 rounded-lg border-2 transition-all font-medium ${
                           formData.correct_answer === 'false'
-                            ? 'border-[var(--error)] bg-[var(--error)]/20 text-[var(--error)]'
-                            : 'border-[var(--card-border)] text-gray-400'
+                            ? 'border-[var(--error)] bg-[var(--error)]/10 text-[var(--error)]'
+                            : 'border-[var(--card-border)] text-[var(--foreground)]/60'
                         }`}
                       >
                         Fals
@@ -273,22 +283,21 @@ export default function PreguntesPage() {
                 )}
 
                 {formData.type === 'multiple_choice' && (
-                  <div>
-                    <label className="preguntes-form-label block text-sm font-medium text-gray-300 mb-2">
+                  <div className="space-y-4">
+                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
                       Opcions (marca la correcta)
                     </label>
-                    <div className="preguntes-form-mc-options space-y-2">
+                    <div className="space-y-3">
                       {formData.options.map((option, index) => (
-                        <div key={index} className="preguntes-form-mc-option flex items-center gap-2">
+                        <div key={index} className="flex items-center gap-3">
                           <input
                             type="radio"
                             name="correct"
                             checked={formData.correct_answer === option && option !== ''}
                             onChange={() => setFormData({ ...formData, correct_answer: option })}
-                            className="preguntes-form-mc-radio"
+                            className="w-5 h-5 text-[var(--primary)] focus:ring-[var(--primary)]"
                           />
-                          <input
-                            type="text"
+                          <Input
                             value={option}
                             onChange={(e) => {
                               const newOptions = [...formData.options];
@@ -296,7 +305,7 @@ export default function PreguntesPage() {
                               setFormData({ ...formData, options: newOptions });
                             }}
                             placeholder={`Opció ${String.fromCharCode(65 + index)}`}
-                            className="preguntes-form-mc-input flex-1 px-4 py-2 bg-[var(--background)] border border-[var(--card-border)] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                            className="!mt-0"
                           />
                         </div>
                       ))}
@@ -304,131 +313,144 @@ export default function PreguntesPage() {
                   </div>
                 )}
 
-                <div className="preguntes-form-active flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
                     id="active"
                     checked={formData.active}
                     onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                    className="preguntes-form-checkbox w-5 h-5 rounded"
+                    className="w-5 h-5 rounded border-[var(--card-border)] text-[var(--primary)] focus:ring-[var(--primary)]"
                   />
-                  <label htmlFor="active" className="text-gray-300">
+                  <label htmlFor="active" className="text-[var(--foreground)]">
                     Pregunta activa
                   </label>
                 </div>
 
-                <div className="preguntes-form-actions flex gap-4 pt-4">
-                  <button
+                <div className="flex gap-4 pt-4">
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={resetForm}
-                    className="preguntes-form-cancel flex-1 py-3 border border-[var(--card-border)] rounded-xl text-gray-300 hover:bg-[var(--card-bg)] transition-all"
+                    fullWidth
                   >
                     Cancel·lar
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
-                    className="preguntes-form-submit flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"
+                    fullWidth
                   >
                     {editingQuestion ? 'Guardar Canvis' : 'Crear Pregunta'}
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
           </div>
         )}
 
         {/* QR Modal */}
         {selectedQR && (
-          <div className="preguntes-qr-modal fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedQR(null)}>
-            <div className="preguntes-qr-content bg-white rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
-              <QRGenerator value={`${getBaseUrl()}/pregunta/${selectedQR}`} size={250} />
-              <p className="text-center text-gray-600 mt-4 text-sm">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in" onClick={() => setSelectedQR(null)}>
+            <Card className="bg-white p-8 max-w-sm w-full" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+              <div className="flex justify-center mb-6">
+                <QRGenerator value={`${getBaseUrl()}/pregunta/${selectedQR}`} size={250} />
+              </div>
+              <p className="text-center text-gray-600 mb-6 text-sm break-all font-mono">
                 {`${getBaseUrl()}/pregunta/${selectedQR}`}
               </p>
-              <button
+              <Button
                 onClick={() => setSelectedQR(null)}
-                className="preguntes-qr-close w-full mt-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 transition-all"
+                fullWidth
+                variant="secondary"
               >
                 Tancar
-              </button>
-            </div>
+              </Button>
+            </Card>
           </div>
         )}
 
         {/* Questions List */}
         {questions.length === 0 ? (
-          <div className="preguntes-empty bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-12 text-center">
-            <div className="preguntes-empty-icon text-6xl mb-4">📝</div>
-            <p className="preguntes-empty-text text-gray-400">
+          <Card className="p-12 text-center">
+            <div className="text-6xl mb-4">📝</div>
+            <p className="text-[var(--foreground)]/60 font-serif italic">
               Encara no hi ha preguntes. Crea la primera!
             </p>
-          </div>
+          </Card>
         ) : (
-          <div className="preguntes-list space-y-4">
+          <div className="space-y-4">
             {questions.map((question) => (
-              <div
+              <Card
                 key={question.id}
-                className={`preguntes-item bg-[var(--card-bg)] border rounded-xl p-6 ${
-                  question.active ? 'border-[var(--card-border)]' : 'border-[var(--error)]/30 opacity-60'
+                className={`transition-all ${
+                  question.active ? '' : 'opacity-60 bg-gray-50'
                 }`}
               >
-                <div className="preguntes-item-header flex items-start justify-between mb-4">
-                  <div className="preguntes-item-info">
-                    <div className="preguntes-item-badges flex items-center gap-2 mb-2">
-                      <span className="preguntes-item-type px-2 py-1 bg-[var(--primary)]/20 text-[var(--primary)] rounded-lg text-xs font-medium">
-                        {getTypeLabel(question.type)}
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--primary)]/10 text-[var(--primary)] rounded-md text-xs font-bold uppercase tracking-wider">
+                        {getTypeIcon(question.type)}
+                        <span className="ml-1">{getTypeLabel(question.type)}</span>
                       </span>
-                      <span className="preguntes-item-points px-2 py-1 bg-[var(--accent)]/20 text-[var(--accent)] rounded-lg text-xs font-medium">
+                      <span className="px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md text-xs font-bold">
                         {question.points} pts
                       </span>
                       {!question.active && (
-                        <span className="preguntes-item-inactive px-2 py-1 bg-[var(--error)]/20 text-[var(--error)] rounded-lg text-xs font-medium">
+                        <span className="px-2 py-1 bg-[var(--foreground)]/10 text-[var(--foreground)]/60 rounded-md text-xs font-bold">
                           Inactiva
                         </span>
                       )}
                     </div>
-                    <h3 className="preguntes-item-title text-lg font-semibold text-white">
+                    <h3 className="text-xl font-serif font-bold text-[var(--foreground)]">
                       {question.title}
                     </h3>
                     {question.description && (
-                      <p className="preguntes-item-desc text-gray-400 text-sm mt-1">
+                      <p className="text-[var(--foreground)]/70 text-sm">
                         {question.description}
                       </p>
                     )}
                   </div>
+                  
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSelectedQR(question.qr_code)}
+                      className="!px-3"
+                      title="Veure QR"
+                    >
+                      <QrCode size={18} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEdit(question)}
+                      className="!px-3 text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                      title="Editar"
+                    >
+                      <Edit2 size={18} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => toggleActive(question)}
+                      className={`!px-3 ${question.active ? 'text-[var(--secondary)]' : 'text-[var(--foreground)]/40'}`}
+                      title={question.active ? "Desactivar" : "Activar"}
+                    >
+                      <Power size={18} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(question.id)}
+                      className="!px-3 text-[var(--error)] hover:bg-[var(--error)]/10"
+                      title="Eliminar"
+                    >
+                      <Trash2 size={18} />
+                    </Button>
+                  </div>
                 </div>
-
-                <div className="preguntes-item-actions flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={() => setSelectedQR(question.qr_code)}
-                    className="preguntes-item-qr px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-all"
-                  >
-                    📱 QR
-                  </button>
-                  <button
-                    onClick={() => handleEdit(question)}
-                    className="preguntes-item-edit px-4 py-2 bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 text-[var(--primary)] rounded-lg text-sm transition-all"
-                  >
-                    ✏️ Editar
-                  </button>
-                  <button
-                    onClick={() => toggleActive(question)}
-                    className={`preguntes-item-toggle px-4 py-2 rounded-lg text-sm transition-all ${
-                      question.active
-                        ? 'bg-[var(--accent)]/20 hover:bg-[var(--accent)]/30 text-[var(--accent)]'
-                        : 'bg-[var(--secondary)]/20 hover:bg-[var(--secondary)]/30 text-[var(--secondary)]'
-                    }`}
-                  >
-                    {question.active ? '⏸️ Desactivar' : '▶️ Activar'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(question.id)}
-                    className="preguntes-item-delete px-4 py-2 bg-[var(--error)]/20 hover:bg-[var(--error)]/30 text-[var(--error)] rounded-lg text-sm transition-all"
-                  >
-                    🗑️ Eliminar
-                  </button>
-                </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}

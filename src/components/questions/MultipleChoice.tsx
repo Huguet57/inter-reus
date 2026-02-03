@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { QuestionProps } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Check } from 'lucide-react';
 
 export default function MultipleChoice({ question, onSubmit, disabled, isSubmitting }: QuestionProps) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -23,40 +25,52 @@ export default function MultipleChoice({ question, onSubmit, disabled, isSubmitt
   };
 
   return (
-    <div className="multiple-choice-question space-y-6">
-      <div className="multiple-choice-options space-y-3">
+    <div className="space-y-8">
+      <div className="grid gap-4">
         {options.map((option, index) => (
           <button
             key={index}
             type="button"
             onClick={() => setSelected(option)}
             disabled={disabled || isSubmitting}
-            className={`multiple-choice-option w-full p-4 rounded-xl border-2 text-left transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center gap-4 ${
+            className={`w-full p-4 rounded-lg border-2 text-left transition-all duration-300 group relative overflow-hidden ${
               selected === option
-                ? 'border-[var(--primary)] bg-[var(--primary)]/20 text-white'
-                : 'border-[var(--card-border)] bg-[var(--card-bg)] text-gray-300 hover:border-[var(--primary)]/50'
-            } ${disabled || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                ? 'border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--primary)] shadow-md'
+                : 'border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--foreground)] hover:border-[var(--primary)]/30'
+            } ${disabled || isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
-            <span className={`multiple-choice-label w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
-              selected === option
-                ? 'bg-[var(--primary)] text-white'
-                : 'bg-[var(--background)] text-gray-400'
-            }`}>
-              {getOptionLabel(index)}
-            </span>
-            <span className="multiple-choice-text flex-1">{option}</span>
+            <div className="flex items-center gap-4 relative z-10">
+              <span className={`w-10 h-10 rounded-full flex items-center justify-center font-serif font-bold text-lg transition-colors ${
+                selected === option
+                  ? 'bg-[var(--primary)] text-white'
+                  : 'bg-[var(--background)] text-[var(--foreground)]/60 group-hover:text-[var(--primary)]'
+              }`}>
+                {getOptionLabel(index)}
+              </span>
+              <span className="flex-1 font-medium text-lg">{option}</span>
+              {selected === option && (
+                <Check className="text-[var(--primary)] animate-fade-in" size={24} />
+              )}
+            </div>
+            
+            {/* Decorative corner for selected state */}
+            {selected === option && (
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[var(--primary)]/5 -mr-8 -mt-8 rounded-full blur-xl"></div>
+            )}
           </button>
         ))}
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={handleSubmit}
         disabled={!selected || disabled || isSubmitting}
-        className="multiple-choice-submit w-full py-4 bg-[var(--secondary)] hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+        fullWidth
+        size="lg"
+        variant="secondary"
       >
-        {isSubmitting ? 'Enviant...' : 'Confirmar Resposta ✨'}
-      </button>
+        {isSubmitting ? 'Enviant...' : 'Confirmar Resposta'}
+      </Button>
     </div>
   );
 }

@@ -6,6 +6,9 @@ import { supabase } from '@/lib/supabase';
 import { getOrCreateDeviceId } from '@/lib/device-id';
 import TeamRegistration from '@/components/TeamRegistration';
 import { Team } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { CheckCircle, Home } from 'lucide-react';
 
 export default function EquipPage() {
   const router = useRouter();
@@ -83,33 +86,48 @@ export default function EquipPage() {
 
   if (loading) {
     return (
-      <div className="equip-loading min-h-screen flex items-center justify-center">
-        <div className="equip-loading-spinner animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   if (team) {
     return (
-      <div className="equip-registered min-h-screen flex items-center justify-center p-4">
-        <div className="equip-registered-card w-full max-w-md bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-8 text-center animate-fade-in">
-          <div className="equip-registered-icon text-6xl mb-4">✅</div>
-          <h1 className="equip-registered-title text-2xl font-bold text-white mb-2">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card variant="ornate" className="w-full max-w-md text-center animate-fade-in">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-[var(--secondary)]/10 text-[var(--secondary)] flex items-center justify-center">
+              <CheckCircle size={32} />
+            </div>
+          </div>
+          
+          <h1 className="text-2xl font-serif font-bold text-[var(--foreground)] mb-2">
             Ja tens equip!
           </h1>
-          <p className="equip-registered-team-name text-3xl font-bold text-[var(--primary)] mb-6">
-            {team.name}
-          </p>
-          <p className="equip-registered-info text-gray-400 mb-8">
+          
+          <div className="my-8 p-4 bg-[var(--background)] border border-[var(--card-border)] rounded-lg">
+            <p className="text-sm text-[var(--foreground)]/60 font-serif uppercase tracking-widest mb-2">Equip Registrat</p>
+            <p className="text-3xl font-serif font-bold text-[var(--primary)]">
+              {team.name}
+            </p>
+          </div>
+          
+          <p className="text-[var(--foreground)]/70 mb-8 font-serif italic">
             Ara busca els QRs i comença a respondre preguntes!
           </p>
-          <button
+          
+          <Button
             onClick={() => router.push('/')}
-            className="equip-registered-btn w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            fullWidth
+            variant="secondary"
           >
-            Tornar a l&apos;inici 🏠
-          </button>
-        </div>
+            <span className="flex items-center justify-center gap-2">
+              <Home size={18} />
+              Tornar a l'inici
+            </span>
+          </Button>
+        </Card>
       </div>
     );
   }

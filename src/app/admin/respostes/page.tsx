@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Answer, Team, Question } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { 
+  ArrowLeft, Trophy, Filter, Calendar, Type, 
+  Image, Video, CheckSquare, List, Check, X 
+} from 'lucide-react';
 
 interface AnswerWithRelations extends Answer {
   team: Team;
@@ -86,20 +92,20 @@ export default function RespostesPage() {
   };
 
   const getTypeIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      text: '✍️',
-      photo: '📷',
-      video: '🎥',
-      true_false: '✓/✗',
-      multiple_choice: '🔘',
+    const icons: Record<string, React.ReactNode> = {
+      text: <Type size={16} />,
+      photo: <Image size={16} />,
+      video: <Video size={16} />,
+      true_false: <CheckSquare size={16} />,
+      multiple_choice: <List size={16} />,
     };
-    return icons[type] || '❓';
+    return icons[type] || <span className="text-lg">❓</span>;
   };
 
   if (loading) {
     return (
-      <div className="respostes-loading min-h-screen flex items-center justify-center">
-        <div className="respostes-loading-spinner animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     );
   }
@@ -107,67 +113,71 @@ export default function RespostesPage() {
   const teamScores = calculateTeamScores();
 
   return (
-    <div className="respostes-page min-h-screen p-4 md:p-8">
-      <div className="respostes-content max-w-6xl mx-auto">
-        <div className="respostes-header flex items-center gap-4 mb-8">
-          <button
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="ghost"
             onClick={() => router.push('/admin')}
-            className="respostes-back text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2"
           >
-            ← Tornar
-          </button>
-          <h1 className="respostes-title text-2xl font-bold text-white">
+            <ArrowLeft size={18} />
+            Tornar
+          </Button>
+          <h1 className="text-2xl font-serif font-bold text-[var(--primary)]">
             Respostes dels Equips
           </h1>
         </div>
 
         {/* Leaderboard */}
         {teamScores.length > 0 && (
-          <div className="respostes-leaderboard bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-6 mb-8">
-            <h2 className="respostes-leaderboard-title text-lg font-semibold text-white mb-4">
-              🏆 Classificació
+          <Card className="mb-8">
+            <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+              <Trophy className="text-[var(--accent)]" />
+              Classificació
             </h2>
-            <div className="respostes-leaderboard-list space-y-2">
+            <div className="space-y-2">
               {teamScores.slice(0, 10).map((team, index) => (
                 <div
                   key={team.name}
-                  className="respostes-leaderboard-item flex items-center justify-between p-3 bg-[var(--background)] rounded-lg"
+                  className="flex items-center justify-between p-3 bg-[var(--background)] border border-[var(--card-border)] rounded-lg"
                 >
-                  <div className="respostes-leaderboard-rank flex items-center gap-3">
-                    <span className={`respostes-leaderboard-position text-xl font-bold ${
-                      index === 0 ? 'text-yellow-400' :
-                      index === 1 ? 'text-gray-300' :
-                      index === 2 ? 'text-amber-600' :
-                      'text-gray-500'
+                  <div className="flex items-center gap-4">
+                    <span className={`text-xl font-bold w-8 text-center ${
+                      index === 0 ? 'text-[var(--accent)]' :
+                      index === 1 ? 'text-[var(--foreground)]/60' :
+                      index === 2 ? 'text-[#B45309]' :
+                      'text-[var(--foreground)]/40'
                     }`}>
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </span>
-                    <span className="respostes-leaderboard-name text-white font-medium">{team.name}</span>
+                    <span className="font-serif font-medium text-[var(--foreground)]">{team.name}</span>
                   </div>
-                  <div className="respostes-leaderboard-stats flex items-center gap-4">
-                    <span className="respostes-leaderboard-answers text-gray-400 text-sm">
+                  <div className="flex items-center gap-6">
+                    <span className="text-[var(--foreground)]/60 text-sm">
                       {team.total} respostes
                     </span>
-                    <span className="respostes-leaderboard-score text-[var(--accent)] font-bold">
+                    <span className="text-[var(--primary)] font-bold">
                       {team.score} pts
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Filters */}
-        <div className="respostes-filters grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="respostes-filter-label block text-sm font-medium text-gray-300 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80 flex items-center gap-2">
+              <Filter size={14} />
               Filtrar per equip
             </label>
             <select
               value={selectedTeam}
               onChange={(e) => setSelectedTeam(e.target.value)}
-              className="respostes-filter-select w-full px-4 py-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              className="w-full px-4 py-3 bg-[var(--card-bg)] border-b-2 border-[var(--card-border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors font-sans"
             >
               <option value="all">Tots els equips</option>
               {teams.map((team) => (
@@ -175,14 +185,15 @@ export default function RespostesPage() {
               ))}
             </select>
           </div>
-          <div>
-            <label className="respostes-filter-label block text-sm font-medium text-gray-300 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80 flex items-center gap-2">
+              <Filter size={14} />
               Filtrar per pregunta
             </label>
             <select
               value={selectedQuestion}
               onChange={(e) => setSelectedQuestion(e.target.value)}
-              className="respostes-filter-select w-full px-4 py-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              className="w-full px-4 py-3 bg-[var(--card-bg)] border-b-2 border-[var(--card-border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors font-sans"
             >
               <option value="all">Totes les preguntes</option>
               {questions.map((q) => (
@@ -194,80 +205,92 @@ export default function RespostesPage() {
 
         {/* Answers List */}
         {filteredAnswers.length === 0 ? (
-          <div className="respostes-empty bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-12 text-center">
-            <div className="respostes-empty-icon text-6xl mb-4">📭</div>
-            <p className="respostes-empty-text text-gray-400">
+          <Card className="p-12 text-center">
+            <div className="text-6xl mb-4">📭</div>
+            <p className="text-[var(--foreground)]/60 font-serif italic">
               No hi ha respostes que coincideixin amb els filtres.
             </p>
-          </div>
+          </Card>
         ) : (
-          <div className="respostes-list space-y-4">
+          <div className="space-y-4">
             {filteredAnswers.map((answer) => (
-              <div
-                key={answer.id}
-                className="respostes-item bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-6"
-              >
-                <div className="respostes-item-header flex items-start justify-between mb-4">
-                  <div className="respostes-item-info">
-                    <div className="respostes-item-badges flex items-center gap-2 mb-2">
-                      <span className="respostes-item-team px-2 py-1 bg-[var(--primary)]/20 text-[var(--primary)] rounded-lg text-xs font-medium">
+              <Card key={answer.id}>
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--primary)]/10 text-[var(--primary)] rounded-md text-xs font-bold uppercase tracking-wider">
                         👥 {answer.team?.name}
                       </span>
-                      <span className="respostes-item-type px-2 py-1 bg-[var(--secondary)]/20 text-[var(--secondary)] rounded-lg text-xs font-medium">
-                        {getTypeIcon(answer.question?.type || '')} {answer.question?.title}
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--secondary)]/10 text-[var(--secondary)] rounded-md text-xs font-bold">
+                        {getTypeIcon(answer.question?.type || '')}
+                        <span className="ml-1">{answer.question?.title}</span>
                       </span>
                       {answer.is_correct !== null && (
-                        <span className={`respostes-item-correct px-2 py-1 rounded-lg text-xs font-medium ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${
                           answer.is_correct
-                            ? 'bg-[var(--secondary)]/20 text-[var(--secondary)]'
-                            : 'bg-[var(--error)]/20 text-[var(--error)]'
+                            ? 'bg-[var(--secondary)]/10 text-[var(--secondary)]'
+                            : 'bg-[var(--error)]/10 text-[var(--error)]'
                         }`}>
-                          {answer.is_correct ? '✓ Correcte' : '✗ Incorrecte'}
+                          {answer.is_correct ? <Check size={12} /> : <X size={12} />}
+                          {answer.is_correct ? 'Correcte' : 'Incorrecte'}
                         </span>
                       )}
                     </div>
-                    <p className="respostes-item-date text-gray-500 text-sm">
+                    <div className="flex items-center gap-2 text-[var(--foreground)]/40 text-sm">
+                      <Calendar size={14} />
                       {formatDate(answer.submitted_at)}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="respostes-item-content">
+                <div className="mt-4">
                   {answer.answer_text && (
-                    <div className="respostes-item-text bg-[var(--background)] rounded-lg p-4">
-                      <p className="text-gray-300">{answer.answer_text}</p>
+                    <div className="bg-[var(--background)] border border-[var(--card-border)] rounded-lg p-4 relative">
+                      {/* Paper lines effect */}
+                      <div className="absolute inset-0 pointer-events-none opacity-5 rounded-lg" 
+                           style={{
+                             backgroundImage: 'linear-gradient(transparent 95%, var(--foreground) 95%)',
+                             backgroundSize: '100% 1.5rem',
+                           }}>
+                      </div>
+                      <p className="text-[var(--foreground)] font-serif text-lg leading-6">{answer.answer_text}</p>
                     </div>
                   )}
                   
                   {answer.answer_file_url && (
-                    <div className="respostes-item-media mt-4">
+                    <div className="mt-4">
                       {answer.question?.type === 'photo' ? (
-                        <img
-                          src={answer.answer_file_url}
-                          alt="Answer"
-                          className="respostes-item-image max-w-sm rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => setViewingMedia(answer.answer_file_url)}
-                        />
+                        <div className="relative group max-w-sm">
+                          <img
+                            src={answer.answer_file_url}
+                            alt="Answer"
+                            className="rounded-lg cursor-pointer transition-transform group-hover:scale-[1.02] border-4 border-white shadow-md"
+                            onClick={() => setViewingMedia(answer.answer_file_url)}
+                          />
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center pointer-events-none">
+                            <span className="text-white font-medium bg-black/50 px-3 py-1 rounded-full">Clic per ampliar</span>
+                          </div>
+                        </div>
                       ) : answer.question?.type === 'video' ? (
                         <video
                           src={answer.answer_file_url}
                           controls
-                          className="respostes-item-video max-w-sm rounded-lg"
+                          className="max-w-sm rounded-lg border-4 border-white shadow-md"
                         />
                       ) : (
                         <a
                           href={answer.answer_file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="respostes-item-link text-[var(--primary)] hover:underline"
+                          className="text-[var(--primary)] hover:underline font-medium"
                         >
-                          Veure fitxer
+                          Veure fitxer adjunt
                         </a>
                       )}
                     </div>
                   )}
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
@@ -275,14 +298,20 @@ export default function RespostesPage() {
         {/* Media Modal */}
         {viewingMedia && (
           <div
-            className="respostes-media-modal fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 animate-fade-in"
             onClick={() => setViewingMedia(null)}
           >
             <img
               src={viewingMedia}
               alt="Full size"
-              className="respostes-media-image max-w-full max-h-full rounded-lg"
+              className="max-w-full max-h-full rounded-lg shadow-2xl"
             />
+            <button 
+              className="absolute top-4 right-4 text-white hover:text-gray-300"
+              onClick={() => setViewingMedia(null)}
+            >
+              <X size={32} />
+            </button>
           </div>
         )}
       </div>
