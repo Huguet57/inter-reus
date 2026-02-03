@@ -1,65 +1,98 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { getOrCreateDeviceId } from '@/lib/device-id';
+import { Team } from '@/types';
 
 export default function Home() {
+  const router = useRouter();
+  const [team, setTeam] = useState<Team | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkTeam = async () => {
+      const deviceId = getOrCreateDeviceId();
+      if (!deviceId) {
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('device_id', deviceId)
+        .single();
+
+      if (data) {
+        setTeam(data);
+      }
+      setLoading(false);
+    };
+
+    checkTeam();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="home-loading min-h-screen flex items-center justify-center">
+        <div className="home-loading-spinner animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="home-main min-h-screen flex items-center justify-center p-4">
+      <div className="home-content w-full max-w-md text-center animate-fade-in">
+        <div className="home-hero mb-8">
+          <div className="home-icon text-8xl mb-6 animate-bounce-slow">🎯</div>
+          <h1 className="home-title text-4xl font-bold text-white mb-4">
+            Joc QR Interactiu
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="home-subtitle text-gray-400 text-lg">
+            Troba els QRs, respon les preguntes i guanya!
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {team ? (
+          <div className="home-team-info space-y-6">
+            <div className="home-team-card bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6">
+              <p className="home-team-label text-gray-400 text-sm mb-1">El teu equip</p>
+              <p className="home-team-name text-2xl font-bold text-[var(--primary)]">{team.name}</p>
+            </div>
+            <div className="home-instructions bg-[var(--secondary)]/10 border border-[var(--secondary)]/20 rounded-xl p-6">
+              <h2 className="home-instructions-title text-lg font-semibold text-[var(--secondary)] mb-3">
+                📍 Com jugar?
+              </h2>
+              <ol className="home-instructions-list text-left text-gray-300 space-y-2">
+                <li className="home-instructions-item">1. Busca els codis QR repartits per la zona</li>
+                <li className="home-instructions-item">2. Escaneja&apos;ls amb el teu mòbil</li>
+                <li className="home-instructions-item">3. Respon les preguntes</li>
+                <li className="home-instructions-item">4. Acumula punts!</li>
+              </ol>
+            </div>
+          </div>
+        ) : (
+          <div className="home-no-team space-y-6">
+            <div className="home-no-team-info bg-[var(--accent)]/10 border border-[var(--accent)]/20 rounded-xl p-6">
+              <p className="home-no-team-text text-[var(--accent)]">
+                ⚠️ Encara no tens equip. Escaneja un QR per registrar-te!
+              </p>
+            </div>
+            <button
+              onClick={() => router.push('/equip')}
+              className="home-register-btn w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Crear Equip Ara 🚀
+            </button>
+          </div>
+        )}
+
+        <div className="home-footer mt-12 text-gray-600 text-sm">
+          <p>Bona sort i que comenci el joc! 🎮</p>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

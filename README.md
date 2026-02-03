@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Joc QR Interactiu 🎯
 
-## Getting Started
+Una aplicació web per crear jocs de caça del tresor amb codis QR. Els jugadors escanegen QRs repartits per una zona i responen preguntes de diversos tipus.
 
-First, run the development server:
+## Característiques
+
+- 🎮 **Diferents tipus de preguntes**: Text, Foto, Vídeo, Veritat/Fals, Selecció Múltiple
+- 👥 **Sistema d'equips**: Cada dispositiu crea el seu equip automàticament
+- 📱 **QR automàtics**: Genera codis QR per cada pregunta
+- 📊 **Panell d'admin**: Gestiona preguntes i veure respostes
+- 🏆 **Classificació**: Seguiment de puntuacions en temps real
+
+## Tecnologies
+
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
+- **Estils**: Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Storage)
+- **Llibreries**: qrcode, react-webcam
+
+## Configuració
+
+### 1. Crear projecte Supabase
+
+1. Ves a [supabase.com](https://supabase.com) i crea un projecte nou
+2. Un cop creat, ves a **SQL Editor** i executa el contingut de `supabase-schema.sql`
+3. Ves a **Storage** i crea un bucket anomenat `answers` amb accés públic
+
+### 2. Configurar variables d'entorn
+
+Copia les credencials del teu projecte Supabase:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+NEXT_PUBLIC_ADMIN_PASSWORD=la_teva_contrasenya_admin
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Instal·lar i executar
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Instal·lar dependències
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Executar en mode desenvolupament
+npm run dev
 
-## Learn More
+# Obrir http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Ús
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Per als administradors
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Ves a `/admin` i introdueix la contrasenya
+2. Crea preguntes amb el formulari
+3. Descarrega els QRs generats i imprimeix-los
+4. Reparteix els QRs per la zona de joc
+5. Monitoritza les respostes en temps real
 
-## Deploy on Vercel
+### Per als jugadors
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Escaneja un codi QR amb el mòbil
+2. Crea el teu equip (només el primer cop)
+3. Respon la pregunta
+4. Continua buscant més QRs!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tipus de preguntes
+
+| Tipus | Descripció | Resposta correcta |
+|-------|------------|-------------------|
+| Text | Resposta escrita lliure | Manual |
+| Foto | Enviar una imatge | Manual |
+| Vídeo | Gravar o pujar vídeo | Manual |
+| V/F | Veritat o Fals | Automàtica |
+| Múltiple | Selecció múltiple | Automàtica |
+
+## Estructura del projecte
+
+```
+src/
+├── app/
+│   ├── page.tsx              # Pàgina principal
+│   ├── equip/page.tsx        # Registre d'equip
+│   ├── pregunta/[qrCode]/    # Pàgines de preguntes
+│   └── admin/                # Panell d'administració
+├── components/
+│   ├── questions/            # Components de preguntes
+│   ├── TeamRegistration.tsx
+│   └── QRGenerator.tsx
+├── lib/
+│   ├── supabase.ts           # Client Supabase
+│   └── device-id.ts          # Identificació dispositiu
+└── types/
+    └── index.ts              # Tipus TypeScript
+```
+
+## Deploy a Vercel
+
+1. Puja el projecte a GitHub
+2. Importa el repositori a [Vercel](https://vercel.com)
+3. Afegeix les variables d'entorn
+4. Deploy!
+
+## Llicència
+
+MIT
