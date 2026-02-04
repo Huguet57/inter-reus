@@ -10,9 +10,15 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { 
   ArrowLeft, Plus, Edit2, Trash2, QrCode, Power, 
-  Type, Image, Video, CheckSquare, List 
+  Type, Image, Video, CheckSquare, List, ChevronRight, ChevronLeft, Check
 } from 'lucide-react';
 import { BADGE_ICONS, BADGE_ICON_CATEGORIES, getBadgeIcon, BadgeIconCategory } from '@/lib/badge-icons';
+
+const FORM_STEPS = [
+  { id: 1, title: 'Informació bàsica', description: 'Títol i descripció' },
+  { id: 2, title: 'Tipus de pregunta', description: 'Format i opcions' },
+  { id: 3, title: 'Insígnia', description: 'Tria la icona' },
+] as const;
 
 export default function PreguntesPage() {
   const router = useRouter();
@@ -34,6 +40,7 @@ export default function PreguntesPage() {
     badge_icon: 'star',
   });
   const [iconCategory, setIconCategory] = useState<BadgeIconCategory>('Monuments');
+  const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin-auth');
@@ -70,6 +77,7 @@ export default function PreguntesPage() {
       badge_icon: 'star',
     });
     setIconCategory('Monuments');
+    setCurrentStep(1);
     setEditingQuestion(null);
     setShowForm(false);
   };
@@ -203,219 +211,327 @@ export default function PreguntesPage() {
           </Button>
         </div>
 
-        {/* Question Form Modal */}
+        {/* Question Form Modal - Step-based */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-6">
-                {editingQuestion ? 'Editar Pregunta' : 'Nova Pregunta'}
-              </h2>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <Input
-                  label="Títol"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                  placeholder="Ex: On es troba la plaça del Mercadal?"
-                />
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                    Descripció / Instruccions
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] placeholder:text-[var(--foreground)]/40 focus:outline-none focus:border-[var(--primary)] transition-colors font-sans resize-none"
-                    placeholder="Instruccions addicionals per als jugadors..."
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                      Tipus de pregunta
-                    </label>
-                    <select
-                      value={formData.type}
-                      onChange={(e) => setFormData({ ...formData, type: e.target.value as QuestionType })}
-                      className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors font-sans"
-                    >
-                      <option value="text">✍️ Resposta escrita</option>
-                      <option value="photo">📷 Enviar foto</option>
-                      <option value="video">🎥 Enviar vídeo</option>
-                      <option value="true_false">✓/✗ Veritat o fals</option>
-                      <option value="multiple_choice">🔘 Selecció múltiple</option>
-                    </select>
-                  </div>
-
-                  <Input
-                    type="number"
-                    label="Punts"
-                    value={formData.points}
-                    onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
-                    min={1}
-                    max={100}
-                  />
-                </div>
-
-                {/* Badge Icon Selector */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                    Icona de la insígnia
-                  </label>
-                  
-                  {/* Category tabs */}
-                  <div className="badge-icon-selector-categories flex flex-wrap gap-1">
-                    {BADGE_ICON_CATEGORIES.map((category) => (
+          <div className="question-form-modal fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+            <Card className="question-form-card w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+              {/* Header with steps */}
+              <div className="question-form-header mb-6">
+                <h2 className="question-form-title text-xl font-serif font-bold text-[var(--foreground)] mb-4">
+                  {editingQuestion ? 'Editar Pregunta' : 'Nova Pregunta'}
+                </h2>
+                
+                {/* Step indicator */}
+                <div className="question-form-steps flex items-center justify-between">
+                  {FORM_STEPS.map((step, index) => (
+                    <div key={step.id} className="question-form-step flex items-center flex-1">
                       <button
-                        key={category}
                         type="button"
-                        onClick={() => setIconCategory(category)}
-                        className={`badge-icon-category-tab px-2 py-1 text-xs rounded-md transition-all ${
-                          iconCategory === category
+                        onClick={() => setCurrentStep(step.id)}
+                        className={`question-form-step-btn flex items-center gap-2 transition-all ${
+                          currentStep === step.id
+                            ? 'text-[var(--primary)]'
+                            : currentStep > step.id
+                            ? 'text-[var(--secondary)]'
+                            : 'text-[var(--foreground)]/40'
+                        }`}
+                      >
+                        <span className={`question-form-step-number w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                          currentStep === step.id
                             ? 'bg-[var(--primary)] text-white'
-                            : 'bg-[var(--card-border)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]/80'
-                        }`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {/* Icons grid */}
-                  <div className="badge-icon-selector-grid grid grid-cols-8 gap-2 p-3 bg-[var(--background)] rounded-lg border border-[var(--card-border)] max-h-32 overflow-y-auto">
-                    {BADGE_ICONS.filter(icon => icon.category === iconCategory).map((iconOption) => {
-                      const IconComponent = iconOption.icon;
-                      return (
-                        <button
-                          key={iconOption.id}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, badge_icon: iconOption.id })}
-                          className={`badge-icon-option aspect-square flex items-center justify-center rounded-lg transition-all ${
-                            formData.badge_icon === iconOption.id
-                              ? 'bg-[var(--accent)] text-white ring-2 ring-[var(--accent)] ring-offset-2'
-                              : 'bg-[var(--card-bg)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)] hover:text-[var(--foreground)]'
-                          }`}
-                          title={iconOption.name}
-                        >
-                          <IconComponent size={18} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* Selected icon preview */}
-                  <div className="badge-icon-selector-preview flex items-center gap-2 text-sm text-[var(--foreground)]/60">
-                    <span>Seleccionada:</span>
-                    {(() => {
-                      const SelectedIcon = getBadgeIcon(formData.badge_icon);
-                      const selectedName = BADGE_ICONS.find(i => i.id === formData.badge_icon)?.name || 'Estrella';
-                      return (
-                        <span className="badge-icon-selector-selected inline-flex items-center gap-1 px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md">
-                          <SelectedIcon size={14} />
-                          {selectedName}
+                            : currentStep > step.id
+                            ? 'bg-[var(--secondary)] text-white'
+                            : 'bg-[var(--card-border)] text-[var(--foreground)]/60'
+                        }`}>
+                          {currentStep > step.id ? <Check size={14} /> : step.id}
                         </span>
-                      );
-                    })()}
-                  </div>
+                        <div className="question-form-step-text hidden sm:block text-left">
+                          <div className="text-xs font-medium">{step.title}</div>
+                          <div className="text-[10px] opacity-60">{step.description}</div>
+                        </div>
+                      </button>
+                      {index < FORM_STEPS.length - 1 && (
+                        <div className={`question-form-step-line flex-1 h-0.5 mx-2 transition-all ${
+                          currentStep > step.id ? 'bg-[var(--secondary)]' : 'bg-[var(--card-border)]'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                {formData.type === 'true_false' && (
-                  <div className="space-y-2">
-                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                      Resposta correcta
-                    </label>
-                    <div className="flex gap-4">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, correct_answer: 'true' })}
-                        className={`flex-1 py-3 rounded-lg border-2 transition-all font-medium ${
-                          formData.correct_answer === 'true'
-                            ? 'border-[var(--secondary)] bg-[var(--secondary)]/10 text-[var(--secondary)]'
-                            : 'border-[var(--card-border)] text-[var(--foreground)]/60'
-                        }`}
-                      >
-                        Veritat
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, correct_answer: 'false' })}
-                        className={`flex-1 py-3 rounded-lg border-2 transition-all font-medium ${
-                          formData.correct_answer === 'false'
-                            ? 'border-[var(--error)] bg-[var(--error)]/10 text-[var(--error)]'
-                            : 'border-[var(--card-border)] text-[var(--foreground)]/60'
-                        }`}
-                      >
-                        Fals
-                      </button>
+              {/* Form content - scrollable */}
+              <form onSubmit={handleSubmit} className="question-form-content flex-1 overflow-y-auto">
+                {/* Step 1: Basic Info */}
+                {currentStep === 1 && (
+                  <div className="question-form-step1 space-y-6 animate-fade-in">
+                    <Input
+                      label="Títol"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      required
+                      placeholder="Ex: On es troba la plaça del Mercadal?"
+                    />
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                        Descripció / Instruccions
+                      </label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        rows={5}
+                        className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] placeholder:text-[var(--foreground)]/40 focus:outline-none focus:border-[var(--primary)] transition-colors font-sans resize-none"
+                        placeholder="Instruccions addicionals per als jugadors..."
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-2">
+                      <input
+                        type="checkbox"
+                        id="active"
+                        checked={formData.active}
+                        onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                        className="w-5 h-5 rounded border-[var(--card-border)] text-[var(--primary)] focus:ring-[var(--primary)]"
+                      />
+                      <label htmlFor="active" className="text-[var(--foreground)]">
+                        Pregunta activa
+                      </label>
                     </div>
                   </div>
                 )}
 
-                {formData.type === 'multiple_choice' && (
-                  <div className="space-y-4">
-                    <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                      Opcions (marca la correcta)
-                    </label>
-                    <div className="space-y-3">
-                      {formData.options.map((option, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <input
-                            type="radio"
-                            name="correct"
-                            checked={formData.correct_answer === option && option !== ''}
-                            onChange={() => setFormData({ ...formData, correct_answer: option })}
-                            className="w-5 h-5 text-[var(--primary)] focus:ring-[var(--primary)]"
-                          />
-                          <Input
-                            value={option}
-                            onChange={(e) => {
-                              const newOptions = [...formData.options];
-                              newOptions[index] = e.target.value;
-                              setFormData({ ...formData, options: newOptions });
-                            }}
-                            placeholder={`Opció ${String.fromCharCode(65 + index)}`}
-                            className="!mt-0"
-                          />
+                {/* Step 2: Question Type */}
+                {currentStep === 2 && (
+                  <div className="question-form-step2 space-y-6 animate-fade-in">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                          Tipus de pregunta
+                        </label>
+                        <select
+                          value={formData.type}
+                          onChange={(e) => setFormData({ ...formData, type: e.target.value as QuestionType })}
+                          className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors font-sans"
+                        >
+                          <option value="text">✍️ Resposta escrita</option>
+                          <option value="photo">📷 Enviar foto</option>
+                          <option value="video">🎥 Enviar vídeo</option>
+                          <option value="true_false">✓/✗ Veritat o fals</option>
+                          <option value="multiple_choice">🔘 Selecció múltiple</option>
+                        </select>
+                      </div>
+
+                      <Input
+                        type="number"
+                        label="Punts"
+                        value={formData.points}
+                        onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
+                        min={1}
+                        max={100}
+                      />
+                    </div>
+
+                    {formData.type === 'true_false' && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                          Resposta correcta
+                        </label>
+                        <div className="flex gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, correct_answer: 'true' })}
+                            className={`flex-1 py-4 rounded-lg border-2 transition-all font-medium ${
+                              formData.correct_answer === 'true'
+                                ? 'border-[var(--secondary)] bg-[var(--secondary)]/10 text-[var(--secondary)]'
+                                : 'border-[var(--card-border)] text-[var(--foreground)]/60'
+                            }`}
+                          >
+                            ✓ Veritat
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, correct_answer: 'false' })}
+                            className={`flex-1 py-4 rounded-lg border-2 transition-all font-medium ${
+                              formData.correct_answer === 'false'
+                                ? 'border-[var(--error)] bg-[var(--error)]/10 text-[var(--error)]'
+                                : 'border-[var(--card-border)] text-[var(--foreground)]/60'
+                            }`}
+                          >
+                            ✗ Fals
+                          </button>
                         </div>
+                      </div>
+                    )}
+
+                    {formData.type === 'multiple_choice' && (
+                      <div className="space-y-4">
+                        <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                          Opcions (marca la correcta)
+                        </label>
+                        <div className="space-y-3">
+                          {formData.options.map((option, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                              <input
+                                type="radio"
+                                name="correct"
+                                checked={formData.correct_answer === option && option !== ''}
+                                onChange={() => setFormData({ ...formData, correct_answer: option })}
+                                className="w-5 h-5 text-[var(--primary)] focus:ring-[var(--primary)]"
+                              />
+                              <Input
+                                value={option}
+                                onChange={(e) => {
+                                  const newOptions = [...formData.options];
+                                  newOptions[index] = e.target.value;
+                                  setFormData({ ...formData, options: newOptions });
+                                }}
+                                placeholder={`Opció ${String.fromCharCode(65 + index)}`}
+                                className="!mt-0"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {['text', 'photo', 'video'].includes(formData.type) && (
+                      <div className="question-form-type-info p-4 bg-[var(--background)] rounded-lg border border-[var(--card-border)]">
+                        <p className="text-sm text-[var(--foreground)]/70 font-serif italic">
+                          {formData.type === 'text' && '✍️ Els jugadors hauran d\'escriure una resposta de text lliure.'}
+                          {formData.type === 'photo' && '📷 Els jugadors hauran de fer una foto i enviar-la.'}
+                          {formData.type === 'video' && '🎥 Els jugadors hauran de gravar un vídeo i enviar-lo.'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Step 3: Badge Icon */}
+                {currentStep === 3 && (
+                  <div className="question-form-step3 space-y-4 animate-fade-in">
+                    <p className="text-sm text-[var(--foreground)]/70 font-serif italic mb-2">
+                      Tria la icona que es mostrarà quan completin aquesta pregunta.
+                    </p>
+                    
+                    {/* Category tabs */}
+                    <div className="question-form-icon-categories flex flex-wrap gap-2">
+                      {BADGE_ICON_CATEGORIES.map((category) => (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={() => setIconCategory(category)}
+                          className={`question-form-icon-category-tab px-3 py-1.5 text-sm rounded-lg transition-all ${
+                            iconCategory === category
+                              ? 'bg-[var(--primary)] text-white shadow-md'
+                              : 'bg-[var(--card-border)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]/80'
+                          }`}
+                        >
+                          {category}
+                        </button>
                       ))}
                     </div>
+                    
+                    {/* Icons grid - now bigger */}
+                    <div className="question-form-icon-grid grid grid-cols-6 sm:grid-cols-8 gap-3 p-4 bg-[var(--background)] rounded-xl border border-[var(--card-border)]">
+                      {BADGE_ICONS.filter(icon => icon.category === iconCategory).map((iconOption) => {
+                        const IconComponent = iconOption.icon;
+                        return (
+                          <button
+                            key={iconOption.id}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, badge_icon: iconOption.id })}
+                            className={`question-form-icon-option aspect-square flex flex-col items-center justify-center gap-1 rounded-xl transition-all p-2 ${
+                              formData.badge_icon === iconOption.id
+                                ? 'bg-[var(--accent)] text-white ring-2 ring-[var(--accent)] ring-offset-2 scale-105'
+                                : 'bg-[var(--card-bg)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)] hover:text-[var(--foreground)] hover:scale-105'
+                            }`}
+                            title={iconOption.name}
+                          >
+                            <IconComponent size={24} />
+                            <span className="text-[9px] truncate w-full text-center">{iconOption.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Selected icon preview - bigger */}
+                    <div className="question-form-icon-preview flex items-center justify-center gap-4 p-4 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--primary)]/10 rounded-xl border border-[var(--accent)]/20">
+                      {(() => {
+                        const SelectedIcon = getBadgeIcon(formData.badge_icon);
+                        const selectedOption = BADGE_ICONS.find(i => i.id === formData.badge_icon);
+                        return (
+                          <>
+                            <div className="question-form-icon-preview-badge w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center shadow-lg">
+                              <SelectedIcon size={32} className="text-white" />
+                            </div>
+                            <div className="question-form-icon-preview-info">
+                              <div className="text-sm text-[var(--foreground)]/60">Icona seleccionada:</div>
+                              <div className="text-lg font-serif font-bold text-[var(--foreground)]">
+                                {selectedOption?.name || 'Estrella'}
+                              </div>
+                              <div className="text-xs text-[var(--foreground)]/40">
+                                Categoria: {selectedOption?.category || 'Altres'}
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
                 )}
+              </form>
 
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="active"
-                    checked={formData.active}
-                    onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                    className="w-5 h-5 rounded border-[var(--card-border)] text-[var(--primary)] focus:ring-[var(--primary)]"
-                  />
-                  <label htmlFor="active" className="text-[var(--foreground)]">
-                    Pregunta activa
-                  </label>
-                </div>
-
-                <div className="flex gap-4 pt-4">
+              {/* Footer with navigation */}
+              <div className="question-form-footer flex gap-3 pt-6 mt-6 border-t border-[var(--card-border)]">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={resetForm}
+                >
+                  Cancel·lar
+                </Button>
+                
+                <div className="flex-1" />
+                
+                {currentStep > 1 && (
                   <Button
                     type="button"
-                    variant="ghost"
-                    onClick={resetForm}
-                    fullWidth
+                    variant="secondary"
+                    onClick={() => setCurrentStep(currentStep - 1)}
+                    className="flex items-center gap-2"
                   >
-                    Cancel·lar
+                    <ChevronLeft size={16} />
+                    Anterior
                   </Button>
+                )}
+                
+                {currentStep < FORM_STEPS.length ? (
                   <Button
-                    type="submit"
-                    fullWidth
+                    type="button"
+                    onClick={() => {
+                      if (currentStep === 1 && !formData.title.trim()) {
+                        alert('Si us plau, introdueix un títol');
+                        return;
+                      }
+                      setCurrentStep(currentStep + 1);
+                    }}
+                    className="flex items-center gap-2"
                   >
+                    Següent
+                    <ChevronRight size={16} />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
+                    className="flex items-center gap-2"
+                  >
+                    <Check size={16} />
                     {editingQuestion ? 'Guardar Canvis' : 'Crear Pregunta'}
                   </Button>
-                </div>
-              </form>
+                )}
+              </div>
             </Card>
           </div>
         )}
