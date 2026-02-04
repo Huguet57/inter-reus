@@ -179,7 +179,7 @@ export default function PreguntaPage() {
       case 'video':
         return <VideoQuestion {...props} />;
       default:
-        return <p className="text-gray-400">Tipus de pregunta no suportat</p>;
+        return <p className="text-[var(--foreground)]/60">Tipus de pregunta no suportat</p>;
     }
   };
 
@@ -196,10 +196,10 @@ export default function PreguntaPage() {
       <div className="pregunta-error min-h-screen flex items-center justify-center p-4">
         <div className="pregunta-error-card w-full max-w-md bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-8 text-center animate-fade-in">
           <div className="pregunta-error-icon text-6xl mb-4">❌</div>
-          <h1 className="pregunta-error-title text-2xl font-bold text-white mb-2">
+          <h1 className="pregunta-error-title text-2xl font-bold text-[var(--foreground)] mb-2">
             Oops!
           </h1>
-          <p className="pregunta-error-message text-gray-400 mb-6">{error}</p>
+          <p className="pregunta-error-message text-[var(--foreground)]/60 mb-6">{error}</p>
           <button
             onClick={() => router.push('/')}
             className="pregunta-error-btn w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"
@@ -222,17 +222,17 @@ export default function PreguntaPage() {
           <div className="pregunta-answered-icon text-6xl mb-4">
             {submitted ? '🎉' : '✅'}
           </div>
-          <h1 className="pregunta-answered-title text-2xl font-bold text-white mb-2">
+          <h1 className="pregunta-answered-title text-2xl font-bold text-[var(--foreground)] mb-2">
             {submitted ? 'Resposta Enviada!' : 'Ja has respost!'}
           </h1>
-          <p className="pregunta-answered-message text-gray-400 mb-2">
+          <p className="pregunta-answered-message text-[var(--foreground)]/60 mb-2">
             {submitted 
               ? 'Molt bé! La teva resposta s\'ha guardat correctament.' 
               : 'Ja havies respost aquesta pregunta anteriorment.'
             }
           </p>
           {question && (
-            <p className="pregunta-answered-points text-[var(--accent)] font-semibold mb-6">
+            <p className="pregunta-answered-points text-[var(--secondary)] font-semibold mb-6">
               +{question.points} punts possibles
             </p>
           )}
@@ -256,17 +256,17 @@ export default function PreguntaPage() {
             <span>{team.name}</span>
           </div>
           
-          <h1 className="pregunta-title text-2xl font-bold text-white mb-2">
+          <h1 className="pregunta-title text-2xl font-bold text-[var(--foreground)] mb-2">
             {question?.title}
           </h1>
           
           {question?.description && (
-            <p className="pregunta-description text-gray-400">
+            <p className="pregunta-description text-[var(--foreground)]/60">
               {question.description}
             </p>
           )}
           
-          <div className="pregunta-points flex items-center gap-2 mt-4 text-[var(--accent)]">
+          <div className="pregunta-points flex items-center gap-2 mt-4 text-[var(--secondary)]">
             <span>⭐</span>
             <span className="font-semibold">{question?.points} punts</span>
           </div>

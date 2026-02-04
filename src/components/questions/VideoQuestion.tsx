@@ -81,7 +81,7 @@ export default function VideoQuestion({ question, onSubmit, disabled, isSubmitti
             type="button"
             onClick={() => setShowCamera(true)}
             disabled={disabled || isSubmitting}
-            className="video-question-record-btn p-6 rounded-xl border-2 border-[var(--card-border)] bg-[var(--card-bg)] text-gray-300 hover:border-[var(--primary)] transition-all transform hover:scale-[1.02]"
+            className="video-question-record-btn p-6 rounded-xl border-2 border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--foreground)] hover:border-[var(--primary)] transition-all transform hover:scale-[1.02]"
           >
             <div className="video-question-icon text-4xl mb-2">🎥</div>
             <div className="video-question-label font-semibold">Gravar Vídeo</div>
@@ -91,7 +91,7 @@ export default function VideoQuestion({ question, onSubmit, disabled, isSubmitti
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled || isSubmitting}
-            className="video-question-upload-btn p-6 rounded-xl border-2 border-[var(--card-border)] bg-[var(--card-bg)] text-gray-300 hover:border-[var(--primary)] transition-all transform hover:scale-[1.02]"
+            className="video-question-upload-btn p-6 rounded-xl border-2 border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--foreground)] hover:border-[var(--primary)] transition-all transform hover:scale-[1.02]"
           >
             <div className="video-question-icon text-4xl mb-2">📁</div>
             <div className="video-question-label font-semibold">Pujar Vídeo</div>
@@ -113,6 +113,7 @@ export default function VideoQuestion({ question, onSubmit, disabled, isSubmitti
             <Webcam
               ref={webcamRef}
               audio={true}
+              muted={true}
               videoConstraints={{
                 facingMode: 'environment',
                 width: 1280,
@@ -134,7 +135,7 @@ export default function VideoQuestion({ question, onSubmit, disabled, isSubmitti
                 if (isRecording) stopRecording();
                 setShowCamera(false);
               }}
-              className="video-question-cancel-btn py-3 border border-[var(--card-border)] rounded-xl text-gray-300 hover:bg-[var(--card-bg)] transition-all"
+              className="video-question-cancel-btn py-3 border border-[var(--card-border)] rounded-xl text-[var(--foreground)] hover:bg-[var(--card-bg)] transition-all"
             >
               Cancel·lar
             </button>
