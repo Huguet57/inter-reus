@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Lock, LogOut, Users, HelpCircle, FileText, Settings, BarChart } from 'lucide-react';
+import { LogOut, Users, HelpCircle, FileText, Settings, BarChart } from 'lucide-react';
 
 interface Stats {
   totalTeams: number;
@@ -68,9 +68,11 @@ export default function AdminPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card variant="ornate" className="w-full max-w-md animate-fade-in">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] mb-4">
-              <Lock size={32} />
-            </div>
+            <img 
+              src="/flag-reus.svg" 
+              alt="Bandera de Reus" 
+              className="w-20 h-auto mx-auto mb-4"
+            />
             <h1 className="text-2xl font-serif font-bold text-[var(--foreground)]">
               Panell d&apos;Administració
             </h1>
