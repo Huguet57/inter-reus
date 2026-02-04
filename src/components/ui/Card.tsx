@@ -4,9 +4,10 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'default' | 'ornate';
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export const Card = ({ children, className = '', variant = 'default' }: CardProps) => {
+export const Card = ({ children, className = '', variant = 'default', onClick }: CardProps) => {
   const baseStyles = "bg-[var(--card-bg)] text-[var(--foreground)] overflow-hidden";
   
   const variants = {
@@ -15,7 +16,7 @@ export const Card = ({ children, className = '', variant = 'default' }: CardProp
   };
 
   return (
-    <div className={`${baseStyles} ${variants[variant]} ${className}`}>
+    <div className={`${baseStyles} ${variants[variant]} ${className}`} onClick={onClick}>
       {variant === 'ornate' && (
         <>
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--accent)] z-10"></div>
