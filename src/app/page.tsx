@@ -7,7 +7,7 @@ import { getOrCreateDeviceId } from '@/lib/device-id';
 import { Team } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { MapPin, ScanLine, HelpCircle, Trophy, Target, Users, ArrowRight } from 'lucide-react';
+import { MapPin, ScanLine, HelpCircle, Trophy, Users, ArrowRight } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -51,9 +51,11 @@ export default function Home() {
         
         {/* Hero Section */}
         <div className="space-y-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] mb-4 border-2 border-[var(--primary)]/20">
-            <Target size={40} strokeWidth={1.5} />
-          </div>
+          <img 
+            src="/flag-reus.svg" 
+            alt="Bandera de Reus" 
+            className="w-24 h-auto mx-auto mb-4"
+          />
           <h1 className="text-5xl font-serif font-bold text-[var(--primary)] leading-tight tracking-tight">
             Joc QR <br/> Interactiu
           </h1>

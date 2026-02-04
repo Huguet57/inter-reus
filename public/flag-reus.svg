@@ -12,6 +12,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="750"
    height="500"
+   viewBox="150 50 450 400"
    id="svg2416"
    sodipodi:version="0.32"
    inkscape:version="0.47 r22583"
@@ -101,13 +102,6 @@
      id="layer1">
     <g
        id="g3793">
-      <rect
-         y="-9.9999997e-06"
-         x="0"
-         height="500"
-         width="750"
-         id="rect2405"
-         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible" />
       <g
          style="stroke:none"
          transform="matrix(1.0239145,0,0,1.0787719,41.201313,-330.86958)"
