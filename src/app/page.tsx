@@ -7,12 +7,14 @@ import { getOrCreateDeviceId } from '@/lib/device-id';
 import { Team } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { MapPin, ScanLine, HelpCircle, Trophy, Users, ArrowRight } from 'lucide-react';
+import { BadgesGrid, useBadgesStats } from '@/components/BadgesGrid';
+import { MapPin, ScanLine, HelpCircle, Trophy, Users, ArrowRight, Star } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
   const [team, setTeam] = useState<Team | null>(null);
   const [loading, setLoading] = useState(true);
+  const badgesStats = useBadgesStats(team?.id);
 
   useEffect(() => {
     const checkTeam = async () => {
@@ -72,9 +74,18 @@ export default function Home() {
                 <span className="text-sm font-serif uppercase tracking-widest">El teu equip</span>
               </div>
               <p className="text-3xl font-serif font-bold text-[var(--primary)]">{team.name}</p>
+              {!badgesStats.loading && badgesStats.total > 0 && (
+                <div className="home-progress-indicator flex items-center gap-2 mt-3 text-sm text-[var(--foreground)]/70">
+                  <Star size={14} className="text-[var(--accent)]" />
+                  <span>{badgesStats.answered} de {badgesStats.total} preguntes</span>
+                </div>
+              )}
             </Card>
 
-            <div className="space-y-4">
+            {/* Badges Grid */}
+            <BadgesGrid teamId={team.id} />
+
+            <div className="home-instructions space-y-4">
               <h2 className="text-xl font-serif font-bold text-[var(--secondary)] flex items-center justify-center gap-2">
                 <span className="w-8 h-[1px] bg-[var(--secondary)]/40"></span>
                 Com jugar?
