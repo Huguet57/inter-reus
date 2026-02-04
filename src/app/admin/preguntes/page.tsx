@@ -286,18 +286,6 @@ export default function PreguntesPage() {
                       />
                     </div>
 
-                    <div className="flex items-center gap-3 pt-2">
-                      <input
-                        type="checkbox"
-                        id="active"
-                        checked={formData.active}
-                        onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                        className="w-5 h-5 rounded border-[var(--card-border)] text-[var(--primary)] focus:ring-[var(--primary)]"
-                      />
-                      <label htmlFor="active" className="text-[var(--foreground)]">
-                        Pregunta activa
-                      </label>
-                    </div>
                   </div>
                 )}
 
