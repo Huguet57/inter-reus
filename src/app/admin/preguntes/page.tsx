@@ -12,6 +12,7 @@ import {
   ArrowLeft, Plus, Edit2, Trash2, QrCode, Power, 
   Type, Image, Video, CheckSquare, List 
 } from 'lucide-react';
+import { BADGE_ICONS, BADGE_ICON_CATEGORIES, getBadgeIcon, BadgeIconCategory } from '@/lib/badge-icons';
 
 export default function PreguntesPage() {
   const router = useRouter();
@@ -30,7 +31,9 @@ export default function PreguntesPage() {
     correct_answer: '',
     points: 10,
     active: true,
+    badge_icon: 'star',
   });
+  const [iconCategory, setIconCategory] = useState<BadgeIconCategory>('Monuments');
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin-auth');
@@ -64,13 +67,16 @@ export default function PreguntesPage() {
       correct_answer: '',
       points: 10,
       active: true,
+      badge_icon: 'star',
     });
+    setIconCategory('Monuments');
     setEditingQuestion(null);
     setShowForm(false);
   };
 
   const handleEdit = (question: Question) => {
     setEditingQuestion(question);
+    const badgeIconOption = BADGE_ICONS.find(icon => icon.id === question.badge_icon);
     setFormData({
       title: question.title,
       description: question.description,
@@ -79,7 +85,11 @@ export default function PreguntesPage() {
       correct_answer: question.correct_answer || '',
       points: question.points,
       active: question.active,
+      badge_icon: question.badge_icon || 'star',
     });
+    if (badgeIconOption) {
+      setIconCategory(badgeIconOption.category as BadgeIconCategory);
+    }
     setShowForm(true);
   };
 
@@ -94,6 +104,7 @@ export default function PreguntesPage() {
       correct_answer: ['true_false', 'multiple_choice'].includes(formData.type) ? formData.correct_answer : null,
       points: formData.points,
       active: formData.active,
+      badge_icon: formData.badge_icon,
     };
 
     if (editingQuestion) {
@@ -248,6 +259,68 @@ export default function PreguntesPage() {
                     min={1}
                     max={100}
                   />
+                </div>
+
+                {/* Badge Icon Selector */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                    Icona de la insígnia
+                  </label>
+                  
+                  {/* Category tabs */}
+                  <div className="badge-icon-selector-categories flex flex-wrap gap-1">
+                    {BADGE_ICON_CATEGORIES.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => setIconCategory(category)}
+                        className={`badge-icon-category-tab px-2 py-1 text-xs rounded-md transition-all ${
+                          iconCategory === category
+                            ? 'bg-[var(--primary)] text-white'
+                            : 'bg-[var(--card-border)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]/80'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Icons grid */}
+                  <div className="badge-icon-selector-grid grid grid-cols-8 gap-2 p-3 bg-[var(--background)] rounded-lg border border-[var(--card-border)] max-h-32 overflow-y-auto">
+                    {BADGE_ICONS.filter(icon => icon.category === iconCategory).map((iconOption) => {
+                      const IconComponent = iconOption.icon;
+                      return (
+                        <button
+                          key={iconOption.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, badge_icon: iconOption.id })}
+                          className={`badge-icon-option aspect-square flex items-center justify-center rounded-lg transition-all ${
+                            formData.badge_icon === iconOption.id
+                              ? 'bg-[var(--accent)] text-white ring-2 ring-[var(--accent)] ring-offset-2'
+                              : 'bg-[var(--card-bg)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)] hover:text-[var(--foreground)]'
+                          }`}
+                          title={iconOption.name}
+                        >
+                          <IconComponent size={18} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Selected icon preview */}
+                  <div className="badge-icon-selector-preview flex items-center gap-2 text-sm text-[var(--foreground)]/60">
+                    <span>Seleccionada:</span>
+                    {(() => {
+                      const SelectedIcon = getBadgeIcon(formData.badge_icon);
+                      const selectedName = BADGE_ICONS.find(i => i.id === formData.badge_icon)?.name || 'Estrella';
+                      return (
+                        <span className="badge-icon-selector-selected inline-flex items-center gap-1 px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md">
+                          <SelectedIcon size={14} />
+                          {selectedName}
+                        </span>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 {formData.type === 'true_false' && (

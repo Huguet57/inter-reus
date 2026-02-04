@@ -17,6 +17,7 @@ export interface Question {
   correct_answer: string | null;
   points: number;
   active: boolean;
+  badge_icon: string | null;
   created_at: string;
 }
 

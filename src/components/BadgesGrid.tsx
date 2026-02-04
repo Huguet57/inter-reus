@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Question, Answer } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { RandomQR } from '@/components/RandomQR';
-import { Camera, Video, MessageSquare, CircleDot, Check } from 'lucide-react';
+import { getBadgeIcon } from '@/lib/badge-icons';
 
 interface QuestionWithAnswer extends Question {
   answered: boolean;
@@ -65,21 +65,6 @@ export function BadgesGrid({
     fetchQuestionsAndAnswers();
   }, [teamId]);
 
-  const getQuestionIcon = (type: string) => {
-    switch (type) {
-      case 'photo':
-        return <Camera size={20} />;
-      case 'video':
-        return <Video size={20} />;
-      case 'true_false':
-        return <CircleDot size={20} />;
-      case 'multiple_choice':
-        return <Check size={20} />;
-      default:
-        return <MessageSquare size={20} />;
-    }
-  };
-
   const answeredCount = questions.filter(q => q.answered).length;
   const totalQuestions = questions.length;
 
@@ -130,7 +115,10 @@ export function BadgesGrid({
                     
                     {/* Badge icon */}
                     <div className="badge-icon text-[var(--accent)] mb-0.5">
-                      {getQuestionIcon(question.type)}
+                      {(() => {
+                        const BadgeIcon = getBadgeIcon(question.badge_icon);
+                        return <BadgeIcon size={20} />;
+                      })()}
                     </div>
                     
                     {/* Question number */}
@@ -148,8 +136,14 @@ export function BadgesGrid({
               </div>
             ) : (
               <div className="badge-locked aspect-square rounded-xl bg-[var(--card-border)] p-0.5">
-                <div className="badge-locked-inner w-full h-full rounded-[10px] bg-[var(--card-bg)] flex items-center justify-center p-2">
+                <div className="badge-locked-inner w-full h-full rounded-[10px] bg-[var(--card-bg)] flex items-center justify-center p-2 relative">
                   <RandomQR seed={index} />
+                  {/* Question mark overlay */}
+                  <div className="badge-locked-overlay absolute inset-0 flex items-center justify-center">
+                    <span className="badge-locked-question-mark text-3xl font-serif font-bold text-[var(--primary)] drop-shadow-[0_2px_2px_rgba(255,255,255,0.8)]">
+                      ?
+                    </span>
+                  </div>
                 </div>
               </div>
             )}

@@ -23,8 +23,12 @@ CREATE TABLE questions (
   correct_answer TEXT,
   points INTEGER NOT NULL DEFAULT 10,
   active BOOLEAN NOT NULL DEFAULT true,
+  badge_icon TEXT DEFAULT 'star',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: Add badge_icon column to existing questions table
+-- ALTER TABLE questions ADD COLUMN IF NOT EXISTS badge_icon TEXT DEFAULT 'star';
 
 -- Answers table
 CREATE TABLE answers (
