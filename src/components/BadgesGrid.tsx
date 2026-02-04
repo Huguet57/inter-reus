@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Question, Answer } from '@/types';
 import { Card } from '@/components/ui/Card';
-import { Lock, Camera, Video, MessageSquare, CircleDot, Check } from 'lucide-react';
+import { RandomQR } from '@/components/RandomQR';
+import { Camera, Video, MessageSquare, CircleDot, Check } from 'lucide-react';
 
 interface QuestionWithAnswer extends Question {
   answered: boolean;
@@ -146,12 +147,9 @@ export function BadgesGrid({
                 </div>
               </div>
             ) : (
-              <div className="badge-locked aspect-square rounded-xl bg-[var(--card-border)] p-0.5 opacity-50">
-                <div className="badge-locked-inner w-full h-full rounded-[10px] bg-[var(--card-bg)] flex flex-col items-center justify-center">
-                  <Lock size={16} className="text-[var(--foreground)]/30 mb-0.5" />
-                  <span className="badge-locked-number text-[10px] font-serif text-[var(--foreground)]/40">
-                    #{index + 1}
-                  </span>
+              <div className="badge-locked aspect-square rounded-xl bg-[var(--card-border)] p-0.5">
+                <div className="badge-locked-inner w-full h-full rounded-[10px] bg-[var(--card-bg)] flex items-center justify-center p-2">
+                  <RandomQR seed={index} />
                 </div>
               </div>
             )}
