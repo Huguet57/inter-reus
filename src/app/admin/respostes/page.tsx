@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { 
   ArrowLeft, Trophy, Filter, Calendar, Type, 
-  Image, Video, CheckSquare, List, Check, X 
+  Image, Video, CheckSquare, List, Check, X, Clock 
 } from 'lucide-react';
 
 interface AnswerWithRelations extends Answer {
@@ -100,6 +100,19 @@ export default function RespostesPage() {
       multiple_choice: <List size={16} />,
     };
     return icons[type] || <span className="text-lg">❓</span>;
+  };
+
+  const handleValidateAnswer = async (answerId: string, isCorrect: boolean) => {
+    const { error } = await supabase
+      .from('answers')
+      .update({ is_correct: isCorrect })
+      .eq('id', answerId);
+
+    if (!error) {
+      setAnswers((prev) =>
+        prev.map((a) => (a.id === answerId ? { ...a, is_correct: isCorrect } : a))
+      );
+    }
   };
 
   if (loading) {
@@ -225,14 +238,19 @@ export default function RespostesPage() {
                         {getTypeIcon(answer.question?.type || '')}
                         <span className="ml-1">{answer.question?.title}</span>
                       </span>
-                      {answer.is_correct !== null && (
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${
+                      {answer.is_correct !== null ? (
+                        <span className={`admin-answer-status-badge inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${
                           answer.is_correct
                             ? 'bg-[var(--secondary)]/10 text-[var(--secondary)]'
                             : 'bg-[var(--error)]/10 text-[var(--error)]'
                         }`}>
                           {answer.is_correct ? <Check size={12} /> : <X size={12} />}
                           {answer.is_correct ? 'Correcte' : 'Incorrecte'}
+                        </span>
+                      ) : (
+                        <span className="admin-answer-pending-badge inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-[var(--accent)]/10 text-[var(--accent)]">
+                          <Clock size={12} />
+                          Pendent
                         </span>
                       )}
                     </div>
@@ -241,6 +259,26 @@ export default function RespostesPage() {
                       {formatDate(answer.submitted_at)}
                     </div>
                   </div>
+
+                  {/* Validation buttons - only for answers not yet validated and not true_false */}
+                  {answer.is_correct === null && (
+                    <div className="admin-answer-validate-buttons flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleValidateAnswer(answer.id, true)}
+                        className="admin-validate-correct-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold bg-[var(--secondary)]/10 text-[var(--secondary)] hover:bg-[var(--secondary)]/20 transition-colors"
+                      >
+                        <Check size={16} />
+                        Correcte
+                      </button>
+                      <button
+                        onClick={() => handleValidateAnswer(answer.id, false)}
+                        className="admin-validate-incorrect-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20 transition-colors"
+                      >
+                        <X size={16} />
+                        Incorrecte
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4">

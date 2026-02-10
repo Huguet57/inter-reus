@@ -13,10 +13,8 @@ export default function MultipleChoice({ question, onSubmit, disabled, isSubmitt
   const handleSubmit = async () => {
     if (!selected || disabled || isSubmitting) return;
     
-    const isCorrect = question.correct_answer === selected;
     await onSubmit({ 
       answer_text: selected,
-      is_correct: isCorrect
     });
   };
 

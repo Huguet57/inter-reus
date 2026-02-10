@@ -81,6 +81,9 @@ CREATE POLICY "Answers are viewable by everyone" ON answers
 CREATE POLICY "Answers can be created by anyone" ON answers
   FOR INSERT WITH CHECK (true);
 
+CREATE POLICY "Answers can be updated by anyone" ON answers
+  FOR UPDATE USING (true);
+
 -- Create storage bucket for answers (photos/videos)
 -- Run this separately in Supabase Storage settings or via API:
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('answers', 'answers', true);
