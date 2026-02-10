@@ -114,11 +114,11 @@ export function BadgesGrid({
                     <div className="badge-flourish-br absolute bottom-0.5 right-0.5 w-2 h-2 border-b border-r border-[var(--accent)]/40 rounded-br" />
                     
                     {/* Badge icon */}
-                    <div className="badge-icon text-[var(--accent)] mb-0.5">
+                    <div className="badge-icon text-[var(--accent)] mb-1">
                       <BadgeDisplay
                         badgeIcon={question.badge_icon}
                         badgeImageUrl={question.badge_image_url}
-                        size={20}
+                        size={40}
                       />
                     </div>
                     
