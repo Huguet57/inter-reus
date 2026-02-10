@@ -5,17 +5,11 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getOrCreateDeviceId } from '@/lib/device-id';
 import TeamRegistration from '@/components/TeamRegistration';
-import { Team } from '@/types';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { BadgesGrid, useBadgesStats } from '@/components/BadgesGrid';
-import { CheckCircle, Home, Star } from 'lucide-react';
 
 export default function EquipPage() {
   const router = useRouter();
-  const [team, setTeam] = useState<Team | null>(null);
   const [loading, setLoading] = useState(true);
-  const badgesStats = useBadgesStats(team?.id);
+  const [hasTeam, setHasTeam] = useState(false);
 
   useEffect(() => {
     const checkTeam = async () => {
@@ -32,13 +26,15 @@ export default function EquipPage() {
         .single();
 
       if (data) {
-        setTeam(data);
+        setHasTeam(true);
+        router.replace(`/equip/${data.id}`);
+        return;
       }
       setLoading(false);
     };
 
     checkTeam();
-  }, []);
+  }, [router]);
 
   const handleRegister = async (teamName: string) => {
     const deviceId = getOrCreateDeviceId();
@@ -54,7 +50,7 @@ export default function EquipPage() {
       .single();
 
     if (existingTeam) {
-      setTeam(existingTeam);
+      router.replace(`/equip/${existingTeam.id}`);
       return;
     }
 
@@ -83,61 +79,13 @@ export default function EquipPage() {
       throw new Error('Error en crear l\'equip. Torna-ho a provar.');
     }
 
-    setTeam(newTeam);
+    router.replace(`/equip/${newTeam.id}`);
   };
 
-  if (loading) {
+  if (loading || hasTeam) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
-  if (team) {
-    return (
-      <div className="min-h-screen p-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          {/* Team Header */}
-          <Card variant="ornate" className="text-center animate-fade-in mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="equip-badge-header w-14 h-14 rounded-full bg-[var(--secondary)]/10 text-[var(--secondary)] flex items-center justify-center">
-                <CheckCircle size={28} />
-              </div>
-            </div>
-            
-            <h1 className="text-xl font-serif font-bold text-[var(--foreground)] mb-1">
-              Equip
-            </h1>
-            
-            <p className="text-2xl font-serif font-bold text-[var(--primary)] mb-4">
-              {team.name}
-            </p>
-            
-            {!badgesStats.loading && badgesStats.total > 0 && (
-              <div className="equip-progress-bar flex items-center justify-center gap-2 text-sm text-[var(--foreground)]/70">
-                <Star size={16} className="text-[var(--accent)]" />
-                <span>{badgesStats.answered} de {badgesStats.total} preguntes</span>
-              </div>
-            )}
-          </Card>
-
-          {/* Badges Grid */}
-          <div className="mb-8">
-            <BadgesGrid teamId={team.id} columns={3} />
-          </div>
-          
-          <Button
-            onClick={() => router.push('/')}
-            fullWidth
-            variant="secondary"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <Home size={18} />
-              Tornar a l'inici
-            </span>
-          </Button>
-        </div>
       </div>
     );
   }
