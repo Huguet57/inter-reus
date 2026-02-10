@@ -260,19 +260,27 @@ export default function RespostesPage() {
                     </div>
                   </div>
 
-                  {/* Validation buttons - only for answers not yet validated and not true_false */}
-                  {answer.is_correct === null && (
+                  {/* Validation buttons - for all answers except auto-scored true_false */}
+                  {answer.question?.type !== 'true_false' && (
                     <div className="admin-answer-validate-buttons flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => handleValidateAnswer(answer.id, true)}
-                        className="admin-validate-correct-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold bg-[var(--secondary)]/10 text-[var(--secondary)] hover:bg-[var(--secondary)]/20 transition-colors"
+                        className={`admin-validate-correct-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                          answer.is_correct === true
+                            ? 'bg-[var(--secondary)] text-white'
+                            : 'bg-[var(--secondary)]/10 text-[var(--secondary)] hover:bg-[var(--secondary)]/20'
+                        }`}
                       >
                         <Check size={16} />
                         Correcte
                       </button>
                       <button
                         onClick={() => handleValidateAnswer(answer.id, false)}
-                        className="admin-validate-incorrect-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20 transition-colors"
+                        className={`admin-validate-incorrect-btn inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                          answer.is_correct === false
+                            ? 'bg-[var(--error)] text-white'
+                            : 'bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20'
+                        }`}
                       >
                         <X size={16} />
                         Incorrecte
