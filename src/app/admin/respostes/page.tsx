@@ -238,6 +238,9 @@ export default function RespostesPage() {
                         {getTypeIcon(answer.question?.type || '')}
                         <span className="ml-1">{answer.question?.title}</span>
                       </span>
+                      <span className="admin-answer-points-badge px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md text-xs font-bold">
+                        {answer.question?.points} pts
+                      </span>
                       {answer.is_correct !== null ? (
                         <span className={`admin-answer-status-badge inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${
                           answer.is_correct

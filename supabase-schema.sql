@@ -24,11 +24,15 @@ CREATE TABLE questions (
   points INTEGER NOT NULL DEFAULT 10,
   active BOOLEAN NOT NULL DEFAULT true,
   badge_icon TEXT DEFAULT 'star',
+  badge_image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Migration: Add badge_icon column to existing questions table
 -- ALTER TABLE questions ADD COLUMN IF NOT EXISTS badge_icon TEXT DEFAULT 'star';
+
+-- Migration: Add badge_image_url column to existing questions table
+-- ALTER TABLE questions ADD COLUMN IF NOT EXISTS badge_image_url TEXT;
 
 -- Answers table
 CREATE TABLE answers (
@@ -94,3 +98,14 @@ CREATE POLICY "Answers can be updated by anyone" ON answers
 -- 
 -- CREATE POLICY "Anyone can view answers bucket" ON storage.objects
 --   FOR SELECT USING (bucket_id = 'answers');
+
+-- Create storage bucket for badge images (custom PNG badges)
+-- Run this separately in Supabase Storage settings or via API:
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('badges', 'badges', true);
+
+-- Storage policy for the badges bucket (run in SQL Editor):
+-- CREATE POLICY "Anyone can upload to badges bucket" ON storage.objects
+--   FOR INSERT WITH CHECK (bucket_id = 'badges');
+-- 
+-- CREATE POLICY "Anyone can view badges bucket" ON storage.objects
+--   FOR SELECT USING (bucket_id = 'badges');

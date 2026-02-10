@@ -231,11 +231,9 @@ export default function PreguntaPage() {
               : 'Ja havies respost aquesta pregunta anteriorment.'
             }
           </p>
-          {question && (
-            <p className="pregunta-answered-points text-[var(--secondary)] font-semibold mb-6">
-              +{question.points} punts possibles
-            </p>
-          )}
+          <p className="pregunta-answered-points text-[var(--secondary)] font-semibold mb-6">
+            Ara valorarem la teva resposta...
+          </p>
           <button
             onClick={() => router.push('/')}
             className="pregunta-answered-btn w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"

@@ -18,6 +18,7 @@ export interface Question {
   points: number;
   active: boolean;
   badge_icon: string | null;
+  badge_image_url: string | null;
   created_at: string;
 }
 
