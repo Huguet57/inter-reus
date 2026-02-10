@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Question, Answer } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { RandomQR } from '@/components/RandomQR';
-import { getBadgeIcon } from '@/lib/badge-icons';
+import { BadgeDisplay } from '@/components/BadgeDisplay';
 
 interface QuestionWithAnswer extends Question {
   answered: boolean;
@@ -115,10 +115,11 @@ export function BadgesGrid({
                     
                     {/* Badge icon */}
                     <div className="badge-icon text-[var(--accent)] mb-0.5">
-                      {(() => {
-                        const BadgeIcon = getBadgeIcon(question.badge_icon);
-                        return <BadgeIcon size={20} />;
-                      })()}
+                      <BadgeDisplay
+                        badgeIcon={question.badge_icon}
+                        badgeImageUrl={question.badge_image_url}
+                        size={20}
+                      />
                     </div>
                     
                     {/* Question number */}

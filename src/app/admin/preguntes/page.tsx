@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { supabase, uploadFile } from '@/lib/supabase';
 import { Question, QuestionType } from '@/types';
 import QRGenerator from '@/components/QRGenerator';
 import { Button } from '@/components/ui/Button';
@@ -10,7 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { 
   ArrowLeft, Plus, Edit2, Trash2, QrCode, Power, 
-  Type, Image, Video, CheckSquare, List, ChevronRight, ChevronLeft, Check
+  Type, Image, Video, CheckSquare, List, ChevronRight, ChevronLeft, Check, Upload, X
 } from 'lucide-react';
 import { BADGE_ICONS, BADGE_ICON_CATEGORIES, getBadgeIcon, BadgeIconCategory } from '@/lib/badge-icons';
 
@@ -38,9 +38,15 @@ export default function PreguntesPage() {
     points: 10,
     active: true,
     badge_icon: 'star',
+    badge_image_url: null as string | null,
   });
   const [iconCategory, setIconCategory] = useState<BadgeIconCategory>('Monuments');
   const [currentStep, setCurrentStep] = useState(1);
+  const [badgeMode, setBadgeMode] = useState<'icon' | 'image'>('icon');
+  const [badgeImageFile, setBadgeImageFile] = useState<File | null>(null);
+  const [badgeImagePreview, setBadgeImagePreview] = useState<string | null>(null);
+  const [uploadingBadge, setUploadingBadge] = useState(false);
+  const badgeFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin-auth');
@@ -75,9 +81,13 @@ export default function PreguntesPage() {
       points: 10,
       active: true,
       badge_icon: 'star',
+      badge_image_url: null,
     });
     setIconCategory('Monuments');
     setCurrentStep(1);
+    setBadgeMode('icon');
+    setBadgeImageFile(null);
+    setBadgeImagePreview(null);
     setEditingQuestion(null);
     setShowForm(false);
   };
@@ -94,7 +104,16 @@ export default function PreguntesPage() {
       points: question.points,
       active: question.active,
       badge_icon: question.badge_icon || 'star',
+      badge_image_url: question.badge_image_url || null,
     });
+    if (question.badge_image_url) {
+      setBadgeMode('image');
+      setBadgeImagePreview(question.badge_image_url);
+    } else {
+      setBadgeMode('icon');
+      setBadgeImagePreview(null);
+    }
+    setBadgeImageFile(null);
     if (badgeIconOption) {
       setIconCategory(badgeIconOption.category as BadgeIconCategory);
     }
@@ -103,6 +122,20 @@ export default function PreguntesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploadingBadge(true);
+
+    let badgeImageUrl: string | null = formData.badge_image_url;
+
+    // Upload new badge image if selected
+    if (badgeMode === 'image' && badgeImageFile) {
+      const fileName = `badge-${Date.now()}-${badgeImageFile.name}`;
+      const uploadedUrl = await uploadFile('badges', fileName, badgeImageFile);
+      if (uploadedUrl) {
+        badgeImageUrl = uploadedUrl;
+      }
+    } else if (badgeMode === 'icon') {
+      badgeImageUrl = null;
+    }
 
     const questionData = {
       title: formData.title,
@@ -113,6 +146,7 @@ export default function PreguntesPage() {
       points: formData.points,
       active: formData.active,
       badge_icon: formData.badge_icon,
+      badge_image_url: badgeImageUrl,
     };
 
     if (editingQuestion) {
@@ -129,6 +163,7 @@ export default function PreguntesPage() {
         });
     }
 
+    setUploadingBadge(false);
     resetForm();
     loadQuestions();
   };
@@ -401,71 +436,190 @@ export default function PreguntesPage() {
                     <p className="text-sm text-[var(--foreground)]/70 font-serif italic mb-2">
                       Tria la icona que es mostrarà quan completin aquesta pregunta.
                     </p>
-                    
-                    {/* Category tabs */}
-                    <div className="question-form-icon-categories flex flex-wrap gap-2">
-                      {BADGE_ICON_CATEGORIES.map((category) => (
-                        <button
-                          key={category}
-                          type="button"
-                          onClick={() => setIconCategory(category)}
-                          className={`question-form-icon-category-tab px-3 py-1.5 text-sm rounded-lg transition-all ${
-                            iconCategory === category
-                              ? 'bg-[var(--primary)] text-white shadow-md'
-                              : 'bg-[var(--card-border)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]/80'
-                          }`}
-                        >
-                          {category}
-                        </button>
-                      ))}
+
+                    {/* Badge mode toggle */}
+                    <div className="question-form-badge-mode-toggle flex rounded-lg overflow-hidden border border-[var(--card-border)]">
+                      <button
+                        type="button"
+                        onClick={() => setBadgeMode('icon')}
+                        className={`question-form-badge-mode-btn flex-1 py-2.5 px-4 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                          badgeMode === 'icon'
+                            ? 'bg-[var(--primary)] text-white'
+                            : 'bg-[var(--card-bg)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]'
+                        }`}
+                      >
+                        <List size={16} />
+                        Icona predefinida
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBadgeMode('image')}
+                        className={`question-form-badge-mode-btn flex-1 py-2.5 px-4 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                          badgeMode === 'image'
+                            ? 'bg-[var(--primary)] text-white'
+                            : 'bg-[var(--card-bg)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]'
+                        }`}
+                      >
+                        <Upload size={16} />
+                        Imatge personalitzada
+                      </button>
                     </div>
-                    
-                    {/* Icons grid - now bigger */}
-                    <div className="question-form-icon-grid grid grid-cols-6 sm:grid-cols-8 gap-3 p-4 bg-[var(--background)] rounded-xl border border-[var(--card-border)]">
-                      {BADGE_ICONS.filter(icon => icon.category === iconCategory).map((iconOption) => {
-                        const IconComponent = iconOption.icon;
-                        return (
+
+                    {badgeMode === 'icon' && (
+                      <>
+                        {/* Category tabs */}
+                        <div className="question-form-icon-categories flex flex-wrap gap-2">
+                          {BADGE_ICON_CATEGORIES.map((category) => (
+                            <button
+                              key={category}
+                              type="button"
+                              onClick={() => setIconCategory(category)}
+                              className={`question-form-icon-category-tab px-3 py-1.5 text-sm rounded-lg transition-all ${
+                                iconCategory === category
+                                  ? 'bg-[var(--primary)] text-white shadow-md'
+                                  : 'bg-[var(--card-border)] text-[var(--foreground)]/60 hover:bg-[var(--card-border)]/80'
+                              }`}
+                            >
+                              {category}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        {/* Icons grid */}
+                        <div className="question-form-icon-grid grid grid-cols-6 sm:grid-cols-8 gap-3 p-4 bg-[var(--background)] rounded-xl border border-[var(--card-border)]">
+                          {BADGE_ICONS.filter(icon => icon.category === iconCategory).map((iconOption) => {
+                            const IconComponent = iconOption.icon;
+                            return (
+                              <button
+                                key={iconOption.id}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, badge_icon: iconOption.id })}
+                                className={`question-form-icon-option aspect-square flex flex-col items-center justify-center gap-1 rounded-xl transition-all p-2 ${
+                                  formData.badge_icon === iconOption.id
+                                    ? 'bg-[var(--accent)] text-white ring-2 ring-[var(--accent)] ring-offset-2 scale-105'
+                                    : 'bg-[var(--card-bg)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)] hover:text-[var(--foreground)] hover:scale-105'
+                                }`}
+                                title={iconOption.name}
+                              >
+                                <IconComponent size={24} />
+                                <span className="text-[9px] truncate w-full text-center">{iconOption.name}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Selected icon preview */}
+                        <div className="question-form-icon-preview flex items-center justify-center gap-4 p-4 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--primary)]/10 rounded-xl border border-[var(--accent)]/20">
+                          {(() => {
+                            const SelectedIcon = getBadgeIcon(formData.badge_icon);
+                            const selectedOption = BADGE_ICONS.find(i => i.id === formData.badge_icon);
+                            return (
+                              <>
+                                <div className="question-form-icon-preview-badge w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center shadow-lg">
+                                  <SelectedIcon size={32} className="text-white" />
+                                </div>
+                                <div className="question-form-icon-preview-info">
+                                  <div className="text-sm text-[var(--foreground)]/60">Icona seleccionada:</div>
+                                  <div className="text-lg font-serif font-bold text-[var(--foreground)]">
+                                    {selectedOption?.name || 'Estrella'}
+                                  </div>
+                                  <div className="text-xs text-[var(--foreground)]/40">
+                                    Categoria: {selectedOption?.category || 'Altres'}
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </>
+                    )}
+
+                    {badgeMode === 'image' && (
+                      <>
+                        {/* File upload area */}
+                        <input
+                          ref={badgeFileInputRef}
+                          type="file"
+                          accept="image/png"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setBadgeImageFile(file);
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setBadgeImagePreview(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+
+                        {!badgeImagePreview ? (
                           <button
-                            key={iconOption.id}
                             type="button"
-                            onClick={() => setFormData({ ...formData, badge_icon: iconOption.id })}
-                            className={`question-form-icon-option aspect-square flex flex-col items-center justify-center gap-1 rounded-xl transition-all p-2 ${
-                              formData.badge_icon === iconOption.id
-                                ? 'bg-[var(--accent)] text-white ring-2 ring-[var(--accent)] ring-offset-2 scale-105'
-                                : 'bg-[var(--card-bg)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)] hover:text-[var(--foreground)] hover:scale-105'
-                            }`}
-                            title={iconOption.name}
+                            onClick={() => badgeFileInputRef.current?.click()}
+                            className="question-form-badge-upload-area w-full p-8 border-2 border-dashed border-[var(--card-border)] rounded-xl hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all flex flex-col items-center justify-center gap-3 cursor-pointer"
                           >
-                            <IconComponent size={24} />
-                            <span className="text-[9px] truncate w-full text-center">{iconOption.name}</span>
+                            <Upload size={40} className="text-[var(--foreground)]/40" />
+                            <div className="text-center">
+                              <p className="text-sm font-medium text-[var(--foreground)]/70">
+                                Clica per pujar una imatge PNG
+                              </p>
+                              <p className="text-xs text-[var(--foreground)]/40 mt-1">
+                                Format PNG amb transparència recomanat
+                              </p>
+                            </div>
                           </button>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Selected icon preview - bigger */}
-                    <div className="question-form-icon-preview flex items-center justify-center gap-4 p-4 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--primary)]/10 rounded-xl border border-[var(--accent)]/20">
-                      {(() => {
-                        const SelectedIcon = getBadgeIcon(formData.badge_icon);
-                        const selectedOption = BADGE_ICONS.find(i => i.id === formData.badge_icon);
-                        return (
-                          <>
-                            <div className="question-form-icon-preview-badge w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center shadow-lg">
-                              <SelectedIcon size={32} className="text-white" />
-                            </div>
-                            <div className="question-form-icon-preview-info">
-                              <div className="text-sm text-[var(--foreground)]/60">Icona seleccionada:</div>
-                              <div className="text-lg font-serif font-bold text-[var(--foreground)]">
-                                {selectedOption?.name || 'Estrella'}
+                        ) : (
+                          <div className="question-form-badge-image-preview space-y-3">
+                            {/* Image preview */}
+                            <div className="question-form-badge-preview-container flex items-center justify-center gap-4 p-4 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--primary)]/10 rounded-xl border border-[var(--accent)]/20">
+                              <div className="question-form-badge-preview-img w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center shadow-lg p-2">
+                                <img
+                                  src={badgeImagePreview}
+                                  alt="Badge preview"
+                                  className="max-w-full max-h-full object-contain"
+                                />
                               </div>
-                              <div className="text-xs text-[var(--foreground)]/40">
-                                Categoria: {selectedOption?.category || 'Altres'}
+                              <div className="question-form-badge-preview-info">
+                                <div className="text-sm text-[var(--foreground)]/60">Imatge seleccionada:</div>
+                                <div className="text-lg font-serif font-bold text-[var(--foreground)]">
+                                  Insígnia personalitzada
+                                </div>
+                                <div className="text-xs text-[var(--foreground)]/40">
+                                  {badgeImageFile ? badgeImageFile.name : 'Imatge existent'}
+                                </div>
                               </div>
                             </div>
-                          </>
-                        );
-                      })()}
-                    </div>
+
+                            {/* Actions */}
+                            <div className="question-form-badge-actions flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => badgeFileInputRef.current?.click()}
+                                className="question-form-badge-change-btn flex-1 py-2 px-3 text-sm rounded-lg bg-[var(--card-border)] text-[var(--foreground)]/70 hover:bg-[var(--card-border)]/80 transition-all flex items-center justify-center gap-2"
+                              >
+                                <Upload size={14} />
+                                Canviar imatge
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setBadgeImageFile(null);
+                                  setBadgeImagePreview(null);
+                                  setFormData({ ...formData, badge_image_url: null });
+                                }}
+                                className="question-form-badge-remove-btn py-2 px-3 text-sm rounded-lg bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20 transition-all flex items-center justify-center gap-2"
+                              >
+                                <X size={14} />
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </form>
@@ -514,9 +668,19 @@ export default function PreguntesPage() {
                     type="button"
                     onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
                     className="flex items-center gap-2"
+                    disabled={uploadingBadge}
                   >
-                    <Check size={16} />
-                    {editingQuestion ? 'Guardar Canvis' : 'Crear Pregunta'}
+                    {uploadingBadge ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                        Guardant...
+                      </>
+                    ) : (
+                      <>
+                        <Check size={16} />
+                        {editingQuestion ? 'Guardar Canvis' : 'Crear Pregunta'}
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
