@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Answer, Team, Question } from '@/types';
+import { getDeviceId } from '@/lib/device-id';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Trophy, ArrowLeft, Clock } from 'lucide-react';
@@ -14,6 +15,7 @@ interface AnswerWithRelations extends Answer {
 }
 
 interface TeamScore {
+  id: string;
   name: string;
   score: number;
   total: number;
@@ -23,6 +25,8 @@ interface TeamScore {
 export default function ClassificacioPage() {
   const router = useRouter();
   const [answers, setAnswers] = useState<AnswerWithRelations[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [myTeamId, setMyTeamId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,24 +34,48 @@ export default function ClassificacioPage() {
   }, []);
 
   const loadData = async () => {
-    const { data } = await supabase
-      .from('answers')
-      .select(`
-        *,
-        team:teams(*),
-        question:questions(*)
-      `);
+    const [answersRes, teamsRes] = await Promise.all([
+      supabase
+        .from('answers')
+        .select(`
+          *,
+          team:teams(*),
+          question:questions(*)
+        `),
+      supabase.from('teams').select('*'),
+    ]);
 
-    setAnswers((data || []) as AnswerWithRelations[]);
+    const allTeams = (teamsRes.data || []) as Team[];
+    setAnswers((answersRes.data || []) as AnswerWithRelations[]);
+    setTeams(allTeams);
+
+    const deviceId = getDeviceId();
+    if (deviceId) {
+      const myTeam = allTeams.find((t) => t.device_id === deviceId);
+      if (myTeam) setMyTeamId(myTeam.id);
+    }
+
     setLoading(false);
   };
 
   const calculateTeamScores = (): TeamScore[] => {
     const scores: Record<string, TeamScore> = {};
 
+    // Inicialitzar tots els equips amb 0
+    teams.forEach((team) => {
+      scores[team.id] = {
+        id: team.id,
+        name: team.name,
+        score: 0,
+        total: 0,
+        pending: 0,
+      };
+    });
+
     answers.forEach((answer) => {
       if (!scores[answer.team_id]) {
         scores[answer.team_id] = {
+          id: answer.team_id,
           name: answer.team?.name || 'Unknown',
           score: 0,
           total: 0,
@@ -111,10 +139,16 @@ export default function ClassificacioPage() {
                 </tr>
               </thead>
               <tbody>
-                {teamScores.map((team, index) => (
+                {teamScores.map((team, index) => {
+                  const isMyTeam = team.id === myTeamId;
+                  return (
                   <tr
                     key={team.name}
-                    className="border-b border-[var(--card-border)] last:border-b-0 bg-[var(--background)] hover:bg-[var(--card-bg)] transition-colors"
+                    className={`border-b border-[var(--card-border)] last:border-b-0 transition-colors ${
+                      isMyTeam
+                        ? 'bg-[#f5e6d3] font-semibold'
+                        : 'bg-[var(--background)] hover:bg-[var(--card-bg)]'
+                    }`}
                   >
                     <td className="px-3 py-3">
                       <span className={`text-lg font-bold ${
@@ -139,7 +173,8 @@ export default function ClassificacioPage() {
                       {team.score}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
