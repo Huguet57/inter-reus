@@ -97,7 +97,7 @@ export default function TeamRegistration({ onRegister }: TeamRegistrationProps) 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
-                MEMBRES DE L&apos;EQUIP <span className="font-normal italic">(opcional)</span>
+                MEMBRES DE L&apos;EQUIP <span className="font-normal italic">(fins a 6 membres)</span>
               </label>
               <span className="text-xs text-[var(--foreground)]/40">
                 {members.filter(m => m.trim()).length}/{MAX_MEMBERS}
@@ -113,7 +113,7 @@ export default function TeamRegistration({ onRegister }: TeamRegistrationProps) 
                 <Input
                   value={member}
                   onChange={(e) => updateMember(index, e.target.value)}
-                  placeholder={`Sobrenom del membre ${index + 1}...`}
+                  placeholder={`Sobrenom ${['del primer', 'del segon', 'del tercer', 'del quart', 'del cinquè', 'del sisè'][index]} membre...`}
                   disabled={isLoading}
                   maxLength={30}
                 />
