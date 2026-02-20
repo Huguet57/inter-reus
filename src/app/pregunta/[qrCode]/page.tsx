@@ -242,23 +242,20 @@ export default function PreguntaPage() {
           <p className="pregunta-answered-points text-[var(--secondary)] font-semibold mb-6">
             Ara valorarem la teva resposta...
           </p>
-          {process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL && (
-            <div className="pregunta-map mb-6">
-              <p className="text-sm text-[var(--foreground)]/60 mb-2">
+          {process.env.NEXT_PUBLIC_GOOGLE_MAPS_URL && (
+            <a
+              href={process.env.NEXT_PUBLIC_GOOGLE_MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pregunta-map block mb-6 p-4 rounded-xl border-2 border-[var(--primary)]/20 bg-[var(--primary)]/5 hover:bg-[var(--primary)]/10 transition-all text-center"
+            >
+              <p className="text-lg font-semibold text-[var(--foreground)] mb-1">
                 📍 On buscar els altres QRs?
               </p>
-              <div style={{ overflow: 'hidden', borderRadius: '12px', height: '250px' }}>
-                <iframe
-                  src={process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL}
-                  width="100%"
-                  height="310"
-                  style={{ border: 0, marginTop: '-60px' }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-            </div>
+              <p className="text-sm text-[var(--foreground)]/60">
+                Obre el mapa amb les pistes →
+              </p>
+            </a>
           )}
           <button
             onClick={() => router.push('/')}
