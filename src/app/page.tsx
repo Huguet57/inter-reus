@@ -113,8 +113,11 @@ export default function Home() {
           <div className="space-y-6 animate-slide-up stagger-1">
             <Card className="bg-[var(--accent)]/5 border-[var(--accent)]/20">
               <p className="text-[var(--foreground)]/80 font-medium flex items-center justify-center gap-2">
-                <span className="text-[var(--accent)]">⚠️</span> 
+                <span className="text-[var(--accent)]">⚠️</span>
                 Encara no tens equip.
+              </p>
+              <p className="text-[var(--foreground)]/50 text-xs mt-1">
+                Registra el teu grup d'amics, no la colla sencera!
               </p>
             </Card>
             

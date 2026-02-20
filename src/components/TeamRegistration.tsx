@@ -53,6 +53,9 @@ export default function TeamRegistration({ onRegister }: TeamRegistrationProps) 
           <p className="text-[var(--foreground)]/60 font-serif italic text-sm">
             Document oficial de participació
           </p>
+          <p className="text-[var(--foreground)]/50 text-xs mt-2">
+            Registra el teu grup d'amics, no la colla sencera!
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
