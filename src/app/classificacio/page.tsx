@@ -99,43 +99,49 @@ export default function ClassificacioPage() {
             </p>
           </Card>
         ) : (
-          <div className="space-y-2">
-            {teamScores.map((team, index) => (
-              <div
-                key={team.name}
-                className={`flex items-center justify-between p-3 bg-[var(--background)] border border-[var(--card-border)] rounded-lg transition-all ${
-                  index < 3 ? 'shadow-sm' : ''
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`text-xl font-bold w-8 text-center ${
-                    index === 0 ? 'text-[var(--accent)]' :
-                    index === 1 ? 'text-[var(--foreground)]/60' :
-                    index === 2 ? 'text-[#B45309]' :
-                    'text-[var(--foreground)]/40'
-                  }`}>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                  </span>
-                  <span className="font-serif font-medium text-[var(--foreground)]">{team.name}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <span className="text-[var(--foreground)]/50 text-xs block">
-                      {team.total} respostes
-                    </span>
-                    {team.pending > 0 && (
-                      <span className="inline-flex items-center gap-1 text-[var(--accent)] text-xs">
-                        <Clock size={10} />
-                        {team.pending} pendents
+          <div className="overflow-x-auto rounded-xl border border-[var(--card-border)] shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-[var(--card-bg)] border-b border-[var(--card-border)]">
+                  <th className="text-left px-3 py-2.5 text-xs font-serif font-semibold text-[var(--foreground)]/60 uppercase tracking-wider">#</th>
+                  <th className="text-left px-3 py-2.5 text-xs font-serif font-semibold text-[var(--foreground)]/60 uppercase tracking-wider">Equip</th>
+                  <th className="text-center px-3 py-2.5 text-xs font-serif font-semibold text-[var(--foreground)]/60 uppercase tracking-wider">Respostes</th>
+                  <th className="text-center px-3 py-2.5 text-xs font-serif font-semibold text-[var(--foreground)]/60 uppercase tracking-wider">Corregides</th>
+                  <th className="text-right px-3 py-2.5 text-xs font-serif font-semibold text-[var(--foreground)]/60 uppercase tracking-wider">Punts</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teamScores.map((team, index) => (
+                  <tr
+                    key={team.name}
+                    className="border-b border-[var(--card-border)] last:border-b-0 bg-[var(--background)] hover:bg-[var(--card-bg)] transition-colors"
+                  >
+                    <td className="px-3 py-3">
+                      <span className={`text-lg font-bold ${
+                        index === 0 ? 'text-[var(--accent)]' :
+                        index === 1 ? 'text-[var(--foreground)]/60' :
+                        index === 2 ? 'text-[#B45309]' :
+                        'text-[var(--foreground)]/40'
+                      }`}>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
                       </span>
-                    )}
-                  </div>
-                  <span className="text-[var(--primary)] font-bold text-lg min-w-[60px] text-right">
-                    {team.score} pts
-                  </span>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td className="px-3 py-3 font-serif font-medium text-[var(--foreground)]">
+                      {team.name}
+                    </td>
+                    <td className="px-3 py-3 text-center text-sm text-[var(--foreground)]/60">
+                      {team.total}
+                    </td>
+                    <td className="px-3 py-3 text-center text-sm text-[var(--foreground)]/60">
+                      {team.total - team.pending}
+                    </td>
+                    <td className="px-3 py-3 text-right text-sm text-[var(--foreground)]/60">
+                      {team.score}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
