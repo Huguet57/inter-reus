@@ -135,6 +135,17 @@ export default function Home() {
           </div>
         )}
 
+        <Button
+          variant="outline"
+          onClick={() => router.push('/classificacio')}
+          fullWidth
+        >
+          <span className="flex items-center justify-center gap-2">
+            <Trophy size={16} />
+            Classificació
+          </span>
+        </Button>
+
         <div className="mt-12 text-[var(--foreground)]/40 text-sm font-serif italic">
           <p>Bona sort i que comenci el joc!</p>
         </div>
