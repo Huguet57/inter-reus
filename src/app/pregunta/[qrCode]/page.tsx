@@ -241,6 +241,22 @@ export default function PreguntaPage() {
           <p className="pregunta-answered-points text-[var(--secondary)] font-semibold mb-6">
             Ara valorarem la teva resposta...
           </p>
+          {process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL && (
+            <div className="pregunta-map mb-6">
+              <p className="text-sm text-[var(--foreground)]/60 mb-2">
+                📍 On buscar els altres QRs?
+              </p>
+              <iframe
+                src={process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL}
+                width="100%"
+                height="300"
+                style={{ border: 0, borderRadius: '12px' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          )}
           <button
             onClick={() => router.push('/')}
             className="pregunta-answered-btn w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold rounded-xl transition-all"
