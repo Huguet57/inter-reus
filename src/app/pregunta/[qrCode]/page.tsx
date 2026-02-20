@@ -13,6 +13,7 @@ import {
   VideoQuestion,
 } from '@/components/questions';
 import { Team, Question, Answer, AnswerPayload } from '@/types';
+import { evaluateTextAnswer } from '@/lib/auto-correct';
 
 export default function PreguntaPage() {
   const params = useParams();
@@ -134,6 +135,12 @@ export default function PreguntaPage() {
         }
       }
 
+      // Determine correctness
+      let isCorrect: boolean | null = answer.is_correct ?? null;
+      if (question.type === 'text' && answer.answer_text) {
+        isCorrect = evaluateTextAnswer(answer.answer_text, question.correct_answer);
+      }
+
       // Save answer
       const { error: insertError } = await supabase
         .from('answers')
@@ -142,7 +149,7 @@ export default function PreguntaPage() {
           question_id: question.id,
           answer_text: answer.answer_text || null,
           answer_file_url: fileUrl,
-          is_correct: answer.is_correct ?? null,
+          is_correct: isCorrect,
         });
 
       if (insertError) {

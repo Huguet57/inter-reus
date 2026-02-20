@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { 
-  ArrowLeft, Plus, Edit2, Trash2, QrCode, Power, 
-  Type, Image, Video, CheckSquare, List, ChevronRight, ChevronLeft, Check, Upload, X
+  ArrowLeft, Plus, Edit2, Trash2, QrCode, Power,
+  Type, Image, Video, CheckSquare, List, ChevronRight, ChevronLeft, Check, Upload, X, ClipboardCheck
 } from 'lucide-react';
 import { BADGE_ICONS, BADGE_ICON_CATEGORIES, getBadgeIcon, BadgeIconCategory } from '@/lib/badge-icons';
 
@@ -92,6 +92,11 @@ export default function PreguntesPage() {
     setShowForm(false);
   };
 
+  const handleEditCorrectAnswer = (question: Question) => {
+    handleEdit(question);
+    setCurrentStep(2);
+  };
+
   const handleEdit = (question: Question) => {
     setEditingQuestion(question);
     const badgeIconOption = BADGE_ICONS.find(icon => icon.id === question.badge_icon);
@@ -142,7 +147,7 @@ export default function PreguntesPage() {
       description: formData.description,
       type: formData.type,
       options: formData.type === 'multiple_choice' ? formData.options.filter(o => o.trim()) : null,
-      correct_answer: ['true_false', 'multiple_choice'].includes(formData.type) ? formData.correct_answer : null,
+      correct_answer: ['true_false', 'multiple_choice', 'text'].includes(formData.type) ? (formData.correct_answer || null) : null,
       points: formData.points,
       active: formData.active,
       badge_icon: formData.badge_icon,
@@ -418,10 +423,27 @@ export default function PreguntesPage() {
                       </div>
                     )}
 
-                    {['text', 'photo', 'video'].includes(formData.type) && (
+                    {formData.type === 'text' && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                          Respostes correctes acceptades (opcional)
+                        </label>
+                        <textarea
+                          value={formData.correct_answer}
+                          onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })}
+                          rows={2}
+                          className="w-full px-2 py-3 bg-transparent border-b-2 border-[var(--card-border)] text-[var(--foreground)] placeholder:text-[var(--foreground)]/40 focus:outline-none focus:border-[var(--primary)] transition-colors font-sans resize-none"
+                          placeholder="Reus, La ciutat de Reus, Capital del Baix Camp"
+                        />
+                        <p className="text-xs text-[var(--foreground)]/50 italic">
+                          Separa amb comes. Si coincideix (ignorant majúscules), es marca correcta automàticament. Si queda buit, totes van a revisió manual.
+                        </p>
+                      </div>
+                    )}
+
+                    {['photo', 'video'].includes(formData.type) && (
                       <div className="question-form-type-info p-4 bg-[var(--background)] rounded-lg border border-[var(--card-border)]">
                         <p className="text-sm text-[var(--foreground)]/70 font-serif italic">
-                          {formData.type === 'text' && '✍️ Els jugadors hauran d\'escriure una resposta de text lliure.'}
                           {formData.type === 'photo' && '📷 Els jugadors hauran de fer una foto i enviar-la.'}
                           {formData.type === 'video' && '🎥 Els jugadors hauran de gravar un vídeo i enviar-lo.'}
                         </p>
@@ -770,6 +792,15 @@ export default function PreguntesPage() {
                       title="Editar"
                     >
                       <Edit2 size={18} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEditCorrectAnswer(question)}
+                      className={`!px-3 ${question.correct_answer ? 'text-[var(--secondary)]' : 'text-[var(--foreground)]/40'}`}
+                      title="Respostes correctes"
+                    >
+                      <ClipboardCheck size={18} />
                     </Button>
                     <Button
                       size="sm"
