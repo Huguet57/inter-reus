@@ -246,15 +246,17 @@ export default function PreguntaPage() {
               <p className="text-sm text-[var(--foreground)]/60 mb-2">
                 📍 On buscar els altres QRs?
               </p>
-              <iframe
-                src={process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL}
-                width="100%"
-                height="300"
-                style={{ border: 0, borderRadius: '12px' }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+              <div style={{ overflow: 'hidden', borderRadius: '12px', height: '250px' }}>
+                <iframe
+                  src={process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL}
+                  width="100%"
+                  height="310"
+                  style={{ border: 0, marginTop: '-60px' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
             </div>
           )}
           <button

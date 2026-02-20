@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { LogOut, Users, HelpCircle, FileText, Settings, BarChart } from 'lucide-react';
+import { LogOut, Users, HelpCircle, FileText, Settings, BarChart, Clock } from 'lucide-react';
 
 interface Stats {
   totalTeams: number;
@@ -164,7 +164,7 @@ export default function AdminPage() {
         </div>
 
         {/* Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <button
             onClick={() => router.push('/admin/preguntes')}
             className="group text-left"
@@ -199,6 +199,25 @@ export default function AdminPage() {
               </h2>
               <p className="text-[var(--foreground)]/60">
                 Consultar totes les respostes enviades pels equips i el seu estat.
+              </p>
+            </Card>
+          </button>
+
+          <button
+            onClick={() => router.push('/admin/log')}
+            className="group text-left"
+          >
+            <Card className="h-full transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg border-[var(--card-border)] group-hover:border-[var(--accent)]/30">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-[var(--background)] border border-[var(--card-border)] flex items-center justify-center text-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white transition-colors">
+                  <Clock size={28} />
+                </div>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-[var(--foreground)] mb-2 group-hover:text-[var(--accent)] transition-colors">
+                Log de Troballes
+              </h2>
+              <p className="text-[var(--foreground)]/60">
+                Veure el registre cronològic de quan els equips troben els QRs.
               </p>
             </Card>
           </button>
