@@ -62,12 +62,13 @@ export default function RespostesPage() {
   });
 
   const calculateTeamScores = () => {
-    const scores: Record<string, { name: string; score: number; total: number }> = {};
+    const scores: Record<string, { name: string; members: string[]; score: number; total: number }> = {};
     
     answers.forEach((answer) => {
       if (!scores[answer.team_id]) {
         scores[answer.team_id] = {
           name: answer.team?.name || 'Unknown',
+          members: answer.team?.members || [],
           score: 0,
           total: 0,
         };
@@ -164,7 +165,14 @@ export default function RespostesPage() {
                     }`}>
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </span>
-                    <span className="font-serif font-medium text-[var(--foreground)]">{team.name}</span>
+                    <div>
+                      <span className="font-serif font-medium text-[var(--foreground)]">{team.name}</span>
+                      {team.members && team.members.length > 0 && (
+                        <span className="ml-2 text-xs font-normal text-[var(--foreground)]/40 italic">
+                          ({team.members.join(', ')})
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <span className="text-[var(--foreground)]/60 text-sm">
@@ -233,6 +241,11 @@ export default function RespostesPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--primary)]/10 text-[var(--primary)] rounded-md text-xs font-bold uppercase tracking-wider">
                         👥 {answer.team?.name}
+                        {answer.team?.members && answer.team.members.length > 0 && (
+                          <span className="font-normal normal-case tracking-normal opacity-70">
+                            ({answer.team.members.join(', ')})
+                          </span>
+                        )}
                       </span>
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--secondary)]/10 text-[var(--secondary)] rounded-md text-xs font-bold">
                         {getTypeIcon(answer.question?.type || '')}

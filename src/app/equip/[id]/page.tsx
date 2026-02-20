@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { BadgesGrid, useBadgesStats } from '@/components/BadgesGrid';
 import { CheckCircle, Home, Star, Trophy } from 'lucide-react';
+import { MembersList } from '@/components/MembersList';
 
 export default function EquipDetailPage() {
   const params = useParams();
@@ -77,10 +78,16 @@ export default function EquipDetailPage() {
             Equip
           </h1>
           
-          <p className="text-2xl font-serif font-bold text-[var(--primary)] mb-4">
+          <p className="text-2xl font-serif font-bold text-[var(--primary)] mb-2">
             {team.name}
           </p>
-          
+
+          {team.members && team.members.length > 0 && (
+            <div className="mb-3 border-t border-[var(--card-border)]/50 pt-3">
+              <MembersList members={team.members} variant="list" />
+            </div>
+          )}
+
           {!badgesStats.loading && badgesStats.total > 0 && (
             <div className="equip-detail-progress-bar flex items-center justify-center gap-2 text-sm text-[var(--foreground)]/70">
               <Star size={16} className="text-[var(--accent)]" />

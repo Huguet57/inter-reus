@@ -83,7 +83,7 @@ export default function PreguntaPage() {
     loadData();
   }, [qrCode]);
 
-  const handleRegister = async (teamName: string) => {
+  const handleRegister = async (teamName: string, members: string[]) => {
     const deviceId = getOrCreateDeviceId();
     if (!deviceId) {
       throw new Error('No s\'ha pogut identificar el dispositiu');
@@ -104,6 +104,7 @@ export default function PreguntaPage() {
       .insert({
         name: teamName,
         device_id: deviceId,
+        members: members,
       })
       .select()
       .single();
@@ -274,9 +275,14 @@ export default function PreguntaPage() {
     <div className="pregunta-page min-h-screen flex items-center justify-center p-4">
       <div className="pregunta-card w-full max-w-lg bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6 animate-fade-in">
         <div className="pregunta-header mb-6">
-          <div className="pregunta-team-badge inline-flex items-center gap-2 bg-[var(--primary)]/20 text-[var(--primary)] px-3 py-1 rounded-full text-sm mb-4">
+          <div className="pregunta-team-badge inline-flex items-center gap-2 bg-[var(--primary)]/20 text-[var(--primary)] px-3 py-1 rounded-full text-sm mb-4 flex-wrap">
             <span>👥</span>
             <span>{team.name}</span>
+            {team.members && team.members.length > 0 && (
+              <span className="text-xs opacity-70">
+                ({team.members.join(', ')})
+              </span>
+            )}
           </div>
           
           <h1 className="pregunta-title text-2xl font-bold text-[var(--foreground)] mb-2">

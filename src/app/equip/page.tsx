@@ -36,7 +36,7 @@ export default function EquipPage() {
     checkTeam();
   }, [router]);
 
-  const handleRegister = async (teamName: string) => {
+  const handleRegister = async (teamName: string, members: string[]) => {
     const deviceId = getOrCreateDeviceId();
     if (!deviceId) {
       throw new Error('No s\'ha pogut identificar el dispositiu');
@@ -71,6 +71,7 @@ export default function EquipPage() {
       .insert({
         name: teamName,
         device_id: deviceId,
+        members: members,
       })
       .select()
       .single();

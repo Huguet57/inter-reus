@@ -4,6 +4,7 @@ export interface Team {
   id: string;
   name: string;
   device_id: string;
+  members: string[];
   created_at: string;
 }
 

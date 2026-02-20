@@ -17,6 +17,7 @@ interface AnswerWithRelations extends Answer {
 interface TeamScore {
   id: string;
   name: string;
+  members: string[];
   score: number;
   total: number;
   pending: number;
@@ -66,6 +67,7 @@ export default function ClassificacioPage() {
       scores[team.id] = {
         id: team.id,
         name: team.name,
+        members: team.members || [],
         score: 0,
         total: 0,
         pending: 0,
@@ -77,6 +79,7 @@ export default function ClassificacioPage() {
         scores[answer.team_id] = {
           id: answer.team_id,
           name: answer.team?.name || 'Unknown',
+          members: answer.team?.members || [],
           score: 0,
           total: 0,
           pending: 0,
@@ -161,7 +164,14 @@ export default function ClassificacioPage() {
                       </span>
                     </td>
                     <td className="px-3 py-3 font-serif font-medium text-[var(--foreground)]">
-                      {team.name}
+                      <div>
+                        {team.name}
+                        {team.members.length > 0 && (
+                          <div className="text-xs font-normal italic text-[var(--foreground)]/50 mt-0.5">
+                            {team.members.join(', ')}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-center text-sm text-[var(--foreground)]/60">
                       {team.total}

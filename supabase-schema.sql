@@ -9,6 +9,7 @@ CREATE TABLE teams (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   device_id TEXT UNIQUE NOT NULL,
+  members JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -27,6 +28,9 @@ CREATE TABLE questions (
   badge_image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: Add members column to existing teams table
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS members JSONB DEFAULT '[]'::jsonb;
 
 -- Migration: Add badge_icon column to existing questions table
 -- ALTER TABLE questions ADD COLUMN IF NOT EXISTS badge_icon TEXT DEFAULT 'star';

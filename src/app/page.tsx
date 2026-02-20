@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { BadgesGrid, useBadgesStats } from '@/components/BadgesGrid';
 import { MapPin, ScanLine, HelpCircle, Trophy, Users, ArrowRight, Star } from 'lucide-react';
+import { MembersList } from '@/components/MembersList';
 
 export default function Home() {
   const router = useRouter();
@@ -74,6 +75,9 @@ export default function Home() {
                 <span className="text-sm font-serif uppercase tracking-widest">El teu equip</span>
               </div>
               <p className="text-3xl font-serif font-bold text-[var(--primary)]">{team.name}</p>
+              {team.members && team.members.length > 0 && (
+                <MembersList members={team.members} variant="inline" className="mt-1" />
+              )}
               {!badgesStats.loading && badgesStats.total > 0 && (
                 <div className="home-progress-indicator flex items-center gap-2 mt-3 text-sm text-[var(--foreground)]/70">
                   <Star size={14} className="text-[var(--accent)]" />

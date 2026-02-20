@@ -4,20 +4,39 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { PenTool } from 'lucide-react';
+import { PenTool, Plus, X } from 'lucide-react';
+
+const MAX_MEMBERS = 6;
 
 interface TeamRegistrationProps {
-  onRegister: (teamName: string) => Promise<void>;
+  onRegister: (teamName: string, members: string[]) => Promise<void>;
 }
 
 export default function TeamRegistration({ onRegister }: TeamRegistrationProps) {
   const [teamName, setTeamName] = useState('');
+  const [members, setMembers] = useState<string[]>(['']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const addMember = () => {
+    if (members.length < MAX_MEMBERS) {
+      setMembers([...members, '']);
+    }
+  };
+
+  const removeMember = (index: number) => {
+    setMembers(members.filter((_, i) => i !== index));
+  };
+
+  const updateMember = (index: number, value: string) => {
+    const updated = [...members];
+    updated[index] = value;
+    setMembers(updated);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!teamName.trim()) {
       setError('Has de posar un nom d\'equip!');
       return;
@@ -28,11 +47,15 @@ export default function TeamRegistration({ onRegister }: TeamRegistrationProps) 
       return;
     }
 
+    const cleanMembers = members
+      .map(m => m.trim())
+      .filter(m => m.length > 0);
+
     setIsLoading(true);
     setError('');
 
     try {
-      await onRegister(teamName.trim());
+      await onRegister(teamName.trim(), cleanMembers);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error en registrar l\'equip');
     } finally {
@@ -69,6 +92,60 @@ export default function TeamRegistration({ onRegister }: TeamRegistrationProps) 
             autoFocus
             error={error}
           />
+
+          {/* Members / Sobrenoms */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-serif font-medium text-[var(--foreground)] opacity-80">
+                MEMBRES DE L&apos;EQUIP <span className="font-normal italic">(opcional)</span>
+              </label>
+              <span className="text-xs text-[var(--foreground)]/40">
+                {members.filter(m => m.trim()).length}/{MAX_MEMBERS}
+              </span>
+            </div>
+
+            <p className="text-[var(--foreground)]/50 text-xs">
+              Afegeix els sobrenoms dels castellers del teu equip
+            </p>
+
+            {members.map((member, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={member}
+                  onChange={(e) => updateMember(index, e.target.value)}
+                  placeholder={`Sobrenom del membre ${index + 1}...`}
+                  disabled={isLoading}
+                  maxLength={30}
+                />
+                {members.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeMember(index)}
+                    className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-[var(--error)] hover:bg-[var(--error)]/10 transition-colors"
+                    disabled={isLoading}
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            ))}
+
+            {members.length < MAX_MEMBERS && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={addMember}
+                disabled={isLoading}
+                fullWidth
+              >
+                <span className="flex items-center justify-center gap-1">
+                  <Plus size={14} />
+                  Afegir membre
+                </span>
+              </Button>
+            )}
+          </div>
 
           <Button
             type="submit"
