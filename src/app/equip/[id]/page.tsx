@@ -7,7 +7,7 @@ import { Team } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { BadgesGrid, useBadgesStats } from '@/components/BadgesGrid';
-import { CheckCircle, Home, Star } from 'lucide-react';
+import { CheckCircle, Home, Star, Trophy } from 'lucide-react';
 
 export default function EquipDetailPage() {
   const params = useParams();
@@ -94,16 +94,29 @@ export default function EquipDetailPage() {
           <BadgesGrid teamId={team.id} columns={3} />
         </div>
         
-        <Button
-          onClick={() => router.push('/')}
-          fullWidth
-          variant="secondary"
-        >
-          <span className="flex items-center justify-center gap-2">
-            <Home size={18} />
-            Tornar a l&apos;inici
-          </span>
-        </Button>
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/classificacio')}
+            fullWidth
+          >
+            <span className="flex items-center justify-center gap-2">
+              <Trophy size={16} />
+              Classificació
+            </span>
+          </Button>
+
+          <Button
+            onClick={() => router.push('/')}
+            fullWidth
+            variant="secondary"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <Home size={18} />
+              Tornar a l&apos;inici
+            </span>
+          </Button>
+        </div>
       </div>
     </div>
   );
