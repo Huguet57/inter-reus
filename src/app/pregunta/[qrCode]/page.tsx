@@ -140,6 +140,10 @@ export default function PreguntaPage() {
       let isCorrect: boolean | null = answer.is_correct ?? null;
       if (question.type === 'text' && answer.answer_text) {
         isCorrect = evaluateTextAnswer(answer.answer_text, question.correct_answer);
+      } else if (question.type === 'multiple_choice' && answer.answer_text) {
+        const normalizedAnswer = answer.answer_text.trim().toLowerCase();
+        const normalizedCorrectAnswer = (question.correct_answer || '').trim().toLowerCase();
+        isCorrect = normalizedAnswer === normalizedCorrectAnswer;
       }
 
       // Save answer
